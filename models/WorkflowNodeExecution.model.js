@@ -1,7 +1,9 @@
 const { DataTypes } = require("sequelize");
 const sequelize = require("../configs/dbConfig");
 const { BACKOFF_STRATEGY } = require("../constants/common");
-const { WORKFLOW_NODE_EXECUTION_STATUS } = require("../constants/workflowExecution");
+const {
+  WORKFLOW_NODE_EXECUTION_STATUS,
+} = require("../constants/workflowExecution");
 
 const WorkflowNodeExecution = sequelize.define(
   "WorkflowNodeExecution",
@@ -50,10 +52,13 @@ const WorkflowNodeExecution = sequelize.define(
   { tableName: "workflow_node_executions" }
 );
 
-// Define associations
-WorkflowNodeExecution.associate = function(models) {
-  WorkflowNodeExecution.belongsTo(models.WorkflowExecution, { foreignKey: "workflowExecutionId" });
-  WorkflowNodeExecution.belongsTo(models.WorkflowNode, { foreignKey: "workflowNodeId" });
+WorkflowNodeExecution.associate = function (models) {
+  WorkflowNodeExecution.belongsTo(models.WorkflowExecution, {
+    foreignKey: "workflowExecutionId",
+  });
+  WorkflowNodeExecution.belongsTo(models.WorkflowNode, {
+    foreignKey: "workflowNodeId",
+  });
 };
 
 module.exports = WorkflowNodeExecution;

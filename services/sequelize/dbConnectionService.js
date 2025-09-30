@@ -1,10 +1,9 @@
-const { sequelize } = require('../../models'); // This will load all models and associations
+const sequelize = require('../../configs/dbConfig');
 
 const connectToDatabase = async () => {
   try {
     await sequelize.authenticate();
     console.log('Database connected successfully!');
-    console.log('All models and associations loaded successfully!');
   } catch (error) {
     console.error('Error connecting to the database - ', error);
     process.exit(1);

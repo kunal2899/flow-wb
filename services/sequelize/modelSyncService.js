@@ -1,5 +1,5 @@
+const sequelize = require("../../configs/dbConfig");
 const models = require("../../models");
-const { sequelize } = models;
 require("dotenv").config({ quiet: true });
 
 const syncModels = async (options = {}) => {

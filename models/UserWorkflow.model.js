@@ -19,22 +19,23 @@ const UserWorkflow = sequelize.define(
       defaultValue: USER_WORKFLOW_ROLE.VIEWER,
     },
   },
-  { 
+  {
     tableName: "user_workflows",
     indexes: [
       {
         unique: true,
-        fields: ['userId', 'workflowId']
-      }
-    ]
+        fields: ["userId", "workflowId"],
+      },
+    ],
   }
 );
 
-// Define associations
-UserWorkflow.associate = function(models) {
+UserWorkflow.associate = function (models) {
   UserWorkflow.belongsTo(models.User, { foreignKey: "userId" });
   UserWorkflow.belongsTo(models.Workflow, { foreignKey: "workflowId" });
-  UserWorkflow.hasMany(models.UserWorkflowTriggers, { foreignKey: "userWorkflowId" });
+  UserWorkflow.hasMany(models.UserWorkflowTriggers, {
+    foreignKey: "userWorkflowId",
+  });
 };
 
 module.exports = UserWorkflow;

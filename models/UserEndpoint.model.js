@@ -22,22 +22,23 @@ const UserEndpoint = sequelize.define(
       type: DataTypes.JSON,
     },
   },
-  { 
+  {
     tableName: "user_endpoints",
     indexes: [
       {
         unique: true,
-        fields: ['userId', 'endpointId']
-      }
-    ]
+        fields: ["userId", "endpointId"],
+      },
+    ],
   }
 );
 
-// Define associations
-UserEndpoint.associate = function(models) {
+UserEndpoint.associate = function (models) {
   UserEndpoint.belongsTo(models.User, { foreignKey: "userId" });
   UserEndpoint.belongsTo(models.Endpoint, { foreignKey: "endpointId" });
-  UserEndpoint.hasMany(models.ActionNodeConfig, { foreignKey: "userEndpointId" });
+  UserEndpoint.hasMany(models.ActionNodeConfig, {
+    foreignKey: "userEndpointId",
+  });
 };
 
 module.exports = UserEndpoint;

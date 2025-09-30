@@ -32,9 +32,7 @@ const Workflow = sequelize.define(
   { tableName: "workflows" }
 );
 
-// Define associations
-Workflow.associate = function(models) {
-  // Use hasMany for UserWorkflow since it has additional business fields (role)
+Workflow.associate = function (models) {
   Workflow.hasMany(models.UserWorkflow, { foreignKey: "workflowId" });
   Workflow.hasMany(models.WorkflowNode, { foreignKey: "workflowId" });
 };

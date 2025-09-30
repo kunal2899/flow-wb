@@ -18,9 +18,10 @@ const ConditionNodeConfig = sequelize.define(
   { tableName: "condition_node_configs" }
 );
 
-// Define associations
-ConditionNodeConfig.associate = function(models) {
-  ConditionNodeConfig.belongsTo(models.WorkflowNode, { foreignKey: "workflowNodeId" });
+ConditionNodeConfig.associate = function (models) {
+  ConditionNodeConfig.belongsTo(models.WorkflowNode, {
+    foreignKey: "workflowNodeId",
+  });
 };
 
 module.exports = ConditionNodeConfig;

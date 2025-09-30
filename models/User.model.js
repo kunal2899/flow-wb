@@ -32,9 +32,7 @@ const User = sequelize.define(
   { tableName: "users" }
 );
 
-// Define associations
-User.associate = function(models) {
-  // Use hasMany for both UserWorkflow and UserEndpoint since they have additional business fields
+User.associate = function (models) {
   User.hasMany(models.UserWorkflow, { foreignKey: "userId" });
   User.hasMany(models.UserEndpoint, { foreignKey: "userId" });
 };

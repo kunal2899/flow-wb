@@ -19,10 +19,13 @@ const ActionNodeConfig = sequelize.define(
   { tableName: "action_node_configs" }
 );
 
-// Define associations
-ActionNodeConfig.associate = function(models) {
-  ActionNodeConfig.belongsTo(models.WorkflowNode, { foreignKey: "workflowNodeId" });
-  ActionNodeConfig.belongsTo(models.UserEndpoint, { foreignKey: "userEndpointId" });
+ActionNodeConfig.associate = function (models) {
+  ActionNodeConfig.belongsTo(models.WorkflowNode, {
+    foreignKey: "workflowNodeId",
+  });
+  ActionNodeConfig.belongsTo(models.UserEndpoint, {
+    foreignKey: "userEndpointId",
+  });
 };
 
 module.exports = ActionNodeConfig;

@@ -31,8 +31,7 @@ const Node = sequelize.define(
   { tableName: "nodes" }
 );
 
-// Define associations
-Node.associate = function(models) {
+Node.associate = function (models) {
   Node.hasMany(models.WorkflowNode, { foreignKey: "nodeId" });
 };
 
