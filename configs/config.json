@@ -1,0 +1,22 @@
+{
+  "local": {
+    "dbUrl": "DATABASE_URL"
+  },
+  "production": {
+    "dbUrl": "DATABASE_URL"
+  },
+  "development": {
+    "host": "DB_HOST",
+    "user": "DB_USER",
+    "password": "DB_PASSWORD",
+    "database": "DB_NAME",
+    "port": "DB_PORT"
+  },
+  "test": {
+    "host": "DB_HOST",
+    "user": "DB_USER",
+    "password": "DB_PASSWORD",
+    "database": "DB_NAME",
+    "port": "DB_PORT"
+  }
+}
