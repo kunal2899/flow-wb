@@ -47,7 +47,7 @@ const pickFields = (validationRules, includeFields = [], requiredFields = [], ov
   );
   
   // If requiredFields is empty and we have included fields, make all included fields required
-  const finalRequiredFields = requiredFields.length === 0 
+  const finalRequiredFields = requiredFields[0] === "*" 
     ? fieldsToInclude 
     : requiredFields;
   

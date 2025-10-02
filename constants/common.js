@@ -16,8 +16,11 @@ const BACKOFF_STRATEGY = {
   CONSTANT: "constant",
 };
 
+const URL_PATTERN = /^(https?:\/\/)?(localhost|\w+(\.\w+)+)(:\d+)?(\/[^\s]*)?$/;
+
 module.exports = {
   VISIBILITY_OPTION,
   HTTP_METHOD,
   BACKOFF_STRATEGY,
+  URL_PATTERN,
 };

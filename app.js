@@ -1,17 +1,29 @@
 const express = require('express');
+const swaggerUi = require('swagger-ui-express');
+const swaggerSpecs = require('./configs/swagger');
 const { connectToDatabase } = require('./services/sequelize/dbConnectionService');
-const usersRoutes = require('./routes/usersRoutes');
+const routes = require('./routes');
 const app = express();
 require('dotenv').config({ quiet: true });
 
 const { PORT=3000 } = process.env;
+const API_VERSION_PREFIX = '/v1';
 
 // Database services
 connectToDatabase();
+
 // Middlewares
 app.use(express.json());
+
+// Swagger documentation
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpecs, {
+  explorer: true,
+  customCss: '.swagger-ui .topbar { display: none }',
+  customSiteTitle: 'Flow WB API Docs'
+}));
+
 // Routes
-app.use('/v1/users', usersRoutes);
+app.use(API_VERSION_PREFIX, routes);
 
 app.listen(PORT, (error) => {
   if (error) {
