@@ -2,7 +2,7 @@ const { DataTypes } = require("sequelize");
 const sequelize = require("../configs/dbConfig");
 
 const ActionNodeConfig = sequelize.define(
-  "ActionNodeConfig",
+  "actionNodeConfig",
   {
     workflowNodeId: {
       type: DataTypes.INTEGER,
@@ -20,10 +20,10 @@ const ActionNodeConfig = sequelize.define(
 );
 
 ActionNodeConfig.associate = function (models) {
-  ActionNodeConfig.belongsTo(models.WorkflowNode, {
+  ActionNodeConfig.belongsTo(models.workflowNode, {
     foreignKey: "workflowNodeId",
   });
-  ActionNodeConfig.belongsTo(models.UserEndpoint, {
+  ActionNodeConfig.belongsTo(models.userEndpoint, {
     foreignKey: "userEndpointId",
   });
 };

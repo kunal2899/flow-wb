@@ -2,7 +2,7 @@ const { DataTypes } = require("sequelize");
 const sequelize = require("../configs/dbConfig");
 
 const DelayNodeConfig = sequelize.define(
-  "DelayNodeConfig",
+  "delayNodeConfig",
   {
     workflowNodeId: {
       type: DataTypes.INTEGER,
@@ -16,7 +16,7 @@ const DelayNodeConfig = sequelize.define(
 );
 
 DelayNodeConfig.associate = function (models) {
-  DelayNodeConfig.belongsTo(models.WorkflowNode, {
+  DelayNodeConfig.belongsTo(models.workflowNode, {
     foreignKey: "workflowNodeId",
   });
 };

@@ -4,7 +4,7 @@ const { VISIBILITY_OPTION } = require("../constants/common");
 const { WORKFLOW_STATUS } = require("../constants/workflow");
 
 const Workflow = sequelize.define(
-  "Workflow",
+  "workflow",
   {
     identifier: {
       type: DataTypes.STRING,
@@ -33,8 +33,8 @@ const Workflow = sequelize.define(
 );
 
 Workflow.associate = function (models) {
-  Workflow.hasMany(models.UserWorkflow, { foreignKey: "workflowId" });
-  Workflow.hasMany(models.WorkflowNode, { foreignKey: "workflowId" });
+  Workflow.hasMany(models.userWorkflow, { foreignKey: "workflowId" });
+  Workflow.hasMany(models.workflowNode, { foreignKey: "workflowId" });
 };
 
 module.exports = Workflow;

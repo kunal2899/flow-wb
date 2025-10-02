@@ -3,7 +3,7 @@ const sequelize = require("../configs/dbConfig");
 const { USER_WORKFLOW_TRIGGER_TYPE } = require("../constants/userWorkflow");
 
 const UserWorkflowTriggers = sequelize.define(
-  "UserWorkflowTriggers",
+  "userWorkflowTriggers",
   {
     userWorkflowId: {
       type: DataTypes.INTEGER,
@@ -33,7 +33,7 @@ const UserWorkflowTriggers = sequelize.define(
 );
 
 UserWorkflowTriggers.associate = function (models) {
-  UserWorkflowTriggers.belongsTo(models.UserWorkflow, {
+  UserWorkflowTriggers.belongsTo(models.userWorkflow, {
     foreignKey: "userWorkflowId",
   });
 };

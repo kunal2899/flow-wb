@@ -6,7 +6,7 @@ const {
 } = require("../constants/workflowExecution");
 
 const WorkflowNodeExecution = sequelize.define(
-  "WorkflowNodeExecution",
+  "workflowNodeExecution",
   {
     workflowExecutionId: {
       type: DataTypes.INTEGER,
@@ -53,10 +53,10 @@ const WorkflowNodeExecution = sequelize.define(
 );
 
 WorkflowNodeExecution.associate = function (models) {
-  WorkflowNodeExecution.belongsTo(models.WorkflowExecution, {
+  WorkflowNodeExecution.belongsTo(models.workflowExecution, {
     foreignKey: "workflowExecutionId",
   });
-  WorkflowNodeExecution.belongsTo(models.WorkflowNode, {
+  WorkflowNodeExecution.belongsTo(models.workflowNode, {
     foreignKey: "workflowNodeId",
   });
 };

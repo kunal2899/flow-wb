@@ -2,7 +2,7 @@ const { DataTypes } = require("sequelize");
 const sequelize = require("../configs/dbConfig");
 
 const ConditionNodeConfig = sequelize.define(
-  "ConditionNodeConfig",
+  "conditionNodeConfig",
   {
     workflowNodeId: {
       type: DataTypes.INTEGER,
@@ -19,7 +19,7 @@ const ConditionNodeConfig = sequelize.define(
 );
 
 ConditionNodeConfig.associate = function (models) {
-  ConditionNodeConfig.belongsTo(models.WorkflowNode, {
+  ConditionNodeConfig.belongsTo(models.workflowNode, {
     foreignKey: "workflowNodeId",
   });
 };

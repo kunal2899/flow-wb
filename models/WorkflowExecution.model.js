@@ -3,7 +3,7 @@ const sequelize = require("../configs/dbConfig");
 const { WORKFLOW_EXECUTION_STATUS } = require("../constants/workflowExecution");
 
 const WorkflowExecution = sequelize.define(
-  "WorkflowExecution",
+  "workflowExecution",
   {
     triggerId: {
       type: DataTypes.INTEGER,
@@ -38,10 +38,10 @@ const WorkflowExecution = sequelize.define(
 );
 
 WorkflowExecution.associate = function (models) {
-  WorkflowExecution.belongsTo(models.UserWorkflowTriggers, {
+  WorkflowExecution.belongsTo(models.userWorkflowTriggers, {
     foreignKey: "triggerId",
   });
-  WorkflowExecution.belongsTo(models.UserWorkflow, {
+  WorkflowExecution.belongsTo(models.userWorkflow, {
     foreignKey: "userWorkFlowId",
   });
 };

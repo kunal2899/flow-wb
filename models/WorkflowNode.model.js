@@ -2,7 +2,7 @@ const { DataTypes } = require("sequelize");
 const sequelize = require("../configs/dbConfig");
 
 const WorkflowNode = sequelize.define(
-  "WorkflowNode",
+  "workflowNode",
   {
     workflowId: {
       type: DataTypes.INTEGER,
@@ -20,26 +20,26 @@ const WorkflowNode = sequelize.define(
 );
 
 WorkflowNode.associate = function (models) {
-  WorkflowNode.belongsTo(models.Workflow, { foreignKey: "workflowId" });
-  WorkflowNode.belongsTo(models.Node, { foreignKey: "nodeId" });
-  WorkflowNode.hasMany(models.ActionNodeConfig, {
+  WorkflowNode.belongsTo(models.workflow, { foreignKey: "workflowId" });
+  WorkflowNode.belongsTo(models.node, { foreignKey: "nodeId" });
+  WorkflowNode.hasMany(models.actionNodeConfig, {
     foreignKey: "workflowNodeId",
   });
-  WorkflowNode.hasMany(models.DelayNodeConfig, {
+  WorkflowNode.hasMany(models.delayNodeConfig, {
     foreignKey: "workflowNodeId",
   });
-  WorkflowNode.hasMany(models.ConditionNodeConfig, {
+  WorkflowNode.hasMany(models.conditionNodeConfig, {
     foreignKey: "workflowNodeId",
   });
-  WorkflowNode.hasMany(models.WorkflowNodeConnections, {
+  WorkflowNode.hasMany(models.workflowNodeConnections, {
     foreignKey: "sourceNodeId",
-    as: "SourceNode",
+    as: "sourceNode",
   });
-  WorkflowNode.hasMany(models.WorkflowNodeConnections, {
+  WorkflowNode.hasMany(models.workflowNodeConnections, {
     foreignKey: "destinationNodeId",
-    as: "DestinationNode",
+    as: "destinationNode",
   });
-  WorkflowNode.hasMany(models.WorkflowNodeExecution, {
+  WorkflowNode.hasMany(models.workflowNodeExecution, {
     foreignKey: "workflowNodeId",
   });
 };

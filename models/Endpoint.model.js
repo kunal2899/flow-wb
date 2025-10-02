@@ -3,7 +3,7 @@ const sequelize = require("../configs/dbConfig");
 const { HTTP_METHOD } = require("../constants/common");
 
 const Endpoint = sequelize.define(
-  "Endpoint",
+  "endpoint",
   {
     name: {
       type: DataTypes.STRING,
@@ -28,7 +28,7 @@ const Endpoint = sequelize.define(
     },
     isGlobal: {
       type: DataTypes.BOOLEAN,
-      defaultValue: true,
+      defaultValue: false,
     },
     provider: {
       type: DataTypes.STRING,
@@ -38,7 +38,7 @@ const Endpoint = sequelize.define(
 );
 
 Endpoint.associate = function (models) {
-  Endpoint.hasMany(models.UserEndpoint, { foreignKey: "endpointId" });
+  Endpoint.hasMany(models.userEndpoint, { foreignKey: "endpointId" });
 };
 
 module.exports = Endpoint;

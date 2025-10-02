@@ -3,7 +3,7 @@ const sequelize = require("../configs/dbConfig");
 const { USER_WORKFLOW_ROLE } = require("../constants/userWorkflow");
 
 const UserWorkflow = sequelize.define(
-  "UserWorkflow",
+  "userWorkflow",
   {
     userId: {
       type: DataTypes.INTEGER,
@@ -16,7 +16,7 @@ const UserWorkflow = sequelize.define(
     role: {
       type: DataTypes.ENUM,
       values: Object.values(USER_WORKFLOW_ROLE),
-      defaultValue: USER_WORKFLOW_ROLE.VIEWER,
+      defaultValue: USER_WORKFLOW_ROLE.OWNER,
     },
   },
   {
@@ -31,9 +31,9 @@ const UserWorkflow = sequelize.define(
 );
 
 UserWorkflow.associate = function (models) {
-  UserWorkflow.belongsTo(models.User, { foreignKey: "userId" });
-  UserWorkflow.belongsTo(models.Workflow, { foreignKey: "workflowId" });
-  UserWorkflow.hasMany(models.UserWorkflowTriggers, {
+  UserWorkflow.belongsTo(models.user, { foreignKey: "userId" });
+  UserWorkflow.belongsTo(models.workflow, { foreignKey: "workflowId", as: "workflow" });
+  UserWorkflow.hasMany(models.userWorkflowTriggers, {
     foreignKey: "userWorkflowId",
   });
 };

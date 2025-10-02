@@ -2,7 +2,7 @@ const { DataTypes } = require("sequelize");
 const sequelize = require("../configs/dbConfig");
 
 const WorkflowNodeConnections = sequelize.define(
-  "WorkflowNodeConnections",
+  "workflowNodeConnections",
   {
     sourceNodeId: {
       type: DataTypes.INTEGER,
@@ -24,15 +24,15 @@ const WorkflowNodeConnections = sequelize.define(
 );
 
 WorkflowNodeConnections.associate = function (models) {
-  WorkflowNodeConnections.belongsTo(models.WorkflowNode, {
+  WorkflowNodeConnections.belongsTo(models.workflowNode, {
     foreignKey: "sourceNodeId",
     as: "SourceNode",
   });
-  WorkflowNodeConnections.belongsTo(models.WorkflowNode, {
+  WorkflowNodeConnections.belongsTo(models.workflowNode, {
     foreignKey: "destinationNodeId",
     as: "DestinationNode",
   });
-  WorkflowNodeConnections.belongsTo(models.ConditionNodeConfig, {
+  WorkflowNodeConnections.belongsTo(models.conditionNodeConfig, {
     foreignKey: "ruleId",
   });
 };

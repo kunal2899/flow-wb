@@ -2,7 +2,7 @@ const { DataTypes } = require("sequelize");
 const sequelize = require("../configs/dbConfig");
 
 const User = sequelize.define(
-  "User",
+  "user",
   {
     firstName: {
       type: DataTypes.STRING,
@@ -33,8 +33,8 @@ const User = sequelize.define(
 );
 
 User.associate = function (models) {
-  User.hasMany(models.UserWorkflow, { foreignKey: "userId" });
-  User.hasMany(models.UserEndpoint, { foreignKey: "userId" });
+  User.hasMany(models.userWorkflow, { foreignKey: "userId" });
+  User.hasMany(models.userEndpoint, { foreignKey: "userId" });
 };
 
 module.exports = User;

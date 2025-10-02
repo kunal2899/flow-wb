@@ -2,7 +2,7 @@ const { DataTypes } = require("sequelize");
 const sequelize = require("../configs/dbConfig");
 
 const UserEndpoint = sequelize.define(
-  "UserEndpoint",
+  "userEndpoint",
   {
     userId: {
       type: DataTypes.INTEGER,
@@ -24,19 +24,13 @@ const UserEndpoint = sequelize.define(
   },
   {
     tableName: "user_endpoints",
-    indexes: [
-      {
-        unique: true,
-        fields: ["userId", "endpointId"],
-      },
-    ],
   }
 );
 
 UserEndpoint.associate = function (models) {
-  UserEndpoint.belongsTo(models.User, { foreignKey: "userId" });
-  UserEndpoint.belongsTo(models.Endpoint, { foreignKey: "endpointId" });
-  UserEndpoint.hasMany(models.ActionNodeConfig, {
+  UserEndpoint.belongsTo(models.user, { foreignKey: "userId" });
+  UserEndpoint.belongsTo(models.endpoint, { foreignKey: "endpointId" });
+  UserEndpoint.hasMany(models.actionNodeConfig, {
     foreignKey: "userEndpointId",
   });
 };

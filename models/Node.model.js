@@ -3,7 +3,7 @@ const sequelize = require("../configs/dbConfig");
 const { NODE_TYPE } = require("../constants/node");
 
 const Node = sequelize.define(
-  "Node",
+  "node",
   {
     name: {
       type: DataTypes.STRING,
@@ -32,7 +32,7 @@ const Node = sequelize.define(
 );
 
 Node.associate = function (models) {
-  Node.hasMany(models.WorkflowNode, { foreignKey: "nodeId" });
+  Node.hasMany(models.workflowNode, { foreignKey: "nodeId" });
 };
 
 module.exports = Node;
