@@ -22,7 +22,7 @@ const getLoginSchemaData = type => {
   switch (type) {
     case "email":
       return Joi.object().keys({
-        ...pickFields(validationRules, ["email", "password"]),
+        ...pickFields(validationRules, ["email", "password"], ["*"]),
       });
     default:
       throw new Error("Invalid login type");
