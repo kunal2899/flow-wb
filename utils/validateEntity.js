@@ -1,4 +1,5 @@
 const validateEntity = ({ schema, entity, onSuccess, onError }) => {
+  if (!entity) throw new Error("Entity is required");
   const { error: validationError } = schema.validate(entity);
     if (validationError) {
       onError?.(validationError);
@@ -9,6 +10,7 @@ const validateEntity = ({ schema, entity, onSuccess, onError }) => {
       );
     }
     onSuccess?.();
+    return true;
 };
 
 module.exports = validateEntity;
