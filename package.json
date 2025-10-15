@@ -5,11 +5,13 @@
   "main": "app.js",
   "scripts": {
     "start": "forever app.js --prod",
-    "local": "NODE_ENV=local nodemon app.js",
+    "workers": "node workers/index.js",
+    "workers:local": "NODE_ENV=local nodemon --watch workers/ workers/index.js",
+    "local": "NODE_ENV=local nodemon --ignore workers/ app.js",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "sync": "node services/sequelize/modelSyncService.js",
-    "sync:force": "node services/sequelize/modelSyncService.js --force",
-    "sync:alter": "node services/sequelize/modelSyncService.js --alter"
+    "sync": "node services/coreServices/modelSyncService.js",
+    "sync:force": "node services/coreServices/modelSyncService.js --force",
+    "sync:alter": "node services/coreServices/modelSyncService.js --alter"
   },
   "repository": {
     "type": "git",
@@ -22,18 +24,25 @@
   },
   "homepage": "https://github.com/kunal2899/flow-wb#readme",
   "dependencies": {
+    "axios": "^1.12.2",
     "bcrypt": "^6.0.0",
+    "bluebird": "^3.7.2",
+    "bullmq": "^5.60.0",
     "express": "^5.1.0",
     "joi": "^18.0.1",
+    "json-logic-js": "^2.0.5",
+    "jsonpath-plus": "^10.3.0",
     "jsonwebtoken": "^9.0.2",
     "lodash": "^4.17.21",
     "pg": "^8.16.3",
     "pg-hstore": "^2.3.4",
+    "redis": "^4.7.0",
     "sequelize": "^6.37.7",
     "swagger-jsdoc": "^6.2.8",
     "swagger-ui-express": "^5.0.1"
   },
   "devDependencies": {
+    "@types/json-logic-js": "^2.0.8",
     "dotenv": "^17.2.2",
     "forever": "^4.0.3",
     "nodemon": "^3.1.10",
