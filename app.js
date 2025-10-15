@@ -1,7 +1,7 @@
 const express = require('express');
 const swaggerUi = require('swagger-ui-express');
 const swaggerSpecs = require('./configs/swagger');
-const { connectToDatabase } = require('./services/sequelize/dbConnectionService');
+const { connectToServices } = require('./services/coreServices/dbConnectionService');
 const routes = require('./routes');
 const app = express();
 require('dotenv').config({ quiet: true });
@@ -9,8 +9,8 @@ require('dotenv').config({ quiet: true });
 const { PORT=3000 } = process.env;
 const API_VERSION_PREFIX = '/v1';
 
-// Database services
-connectToDatabase();
+// Connect to DB and Redis services
+connectToServices();
 
 // Middlewares
 app.use(express.json());
