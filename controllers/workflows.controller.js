@@ -3,14 +3,15 @@ const Workflow = require("../models/Workflow.model");
 const generateIdentifier = require("../utils/generateIdentifier");
 const sequelize = require("../configs/dbConfig");
 const { NODE_TYPE } = require("../constants/node");
-const { get, pick, omit } = require("lodash");
+const { get, pick, omit, map } = require("lodash");
 const Endpoint = require("../models/Endpoint.model");
 const ActionNodeConfig = require("../models/ActionNodeConfig.model");
 const Node = require("../models/Node.model");
 const WorkflowNode = require("../models/WorkflowNode.model");
 const UserEndpoint = require("../models/UserEndpoint.model");
-const ConditionNodeConfig = require("../models/ConditionNodeConfig.model");
 const DelayNodeConfig = require("../models/DelayNodeConfig.model");
+const Rule = require("../models/Rule.model");
+const WorkflowNodeConnections = require("../models/WorkflowNodeConnections.model");
 
 /**
  * @swagger
@@ -29,7 +30,10 @@ const DelayNodeConfig = require("../models/DelayNodeConfig.model");
  *             schema:
  *               type: object
  *               properties:
- *                 userWorkflows:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 data:
  *                   type: array
  *                   items:
  *                     $ref: '#/components/schemas/UserWorkflow'
@@ -64,10 +68,12 @@ const getAllWorkflows = async (req, res) => {
         },
       ],
     });
-    return res.status(200).json({ userWorkflows });
+    return res.status(200).json({ success: true, data: userWorkflows });
   } catch (error) {
     console.error("Error in workflowsController.getAllWorkflows - ", error);
-    return res.status(400).send({ message: "Something went wrong!" });
+    return res
+      .status(400)
+      .send({ success: false, message: "Something went wrong!" });
   }
 };
 
@@ -94,7 +100,13 @@ const getAllWorkflows = async (req, res) => {
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/UserWorkflow'
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 data:
+ *                   $ref: '#/components/schemas/UserWorkflow'
  *       400:
  *         description: Bad request
  *         content:
@@ -122,10 +134,12 @@ const getAllWorkflows = async (req, res) => {
  */
 const getWorkflow = async (req, res) => {
   try {
-    return res.status(200).json(req.userWorkflow);
+    return res.status(200).json({ success: true, data: req.userWorkflow });
   } catch (error) {
     console.error("Error in workflowsController.getWorkflow - ", error);
-    return res.status(400).send({ message: "Something went wrong!" });
+    return res
+      .status(400)
+      .send({ success: false, message: "Something went wrong!" });
   }
 };
 
@@ -187,13 +201,16 @@ const createWorkflow = async (req, res) => {
         { transaction: t }
       );
       return res.status(201).json({
+        success: true,
         message: "Workflow created successfully",
-        workflow: newWorkflow,
+        data: newWorkflow,
       });
     });
   } catch (error) {
     console.error("Error in workflowsController.createWorkflow - ", error);
-    return res.status(400).send({ message: "Something went wrong!" });
+    return res
+      .status(400)
+      .send({ success: false, message: "Something went wrong!" });
   }
 };
 
@@ -228,11 +245,14 @@ const createWorkflow = async (req, res) => {
  *             schema:
  *               type: object
  *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 data:
+ *                   $ref: '#/components/schemas/Workflow'
  *                 message:
  *                   type: string
  *                   example: "Workflow updated successfully"
- *                 updatedWorkflow:
- *                   $ref: '#/components/schemas/Workflow'
  *       400:
  *         description: Bad request - Invalid input data
  *         content:
@@ -266,10 +286,16 @@ const updateWorkflow = async (req, res) => {
       where: { id: workflowId },
       returning: true,
     });
-    return res.status(200).json({ message: "Workflow updated successfully", updatedWorkflow  });
+    return res.status(200).json({
+      success: true,
+      data: updatedWorkflow,
+      message: "Workflow updated successfully",
+    });
   } catch (error) {
     console.error("Error in workflowsController.updateWorkflow - ", error);
-    return res.status(400).send({ message: "Something went wrong!" });
+    return res
+      .status(400)
+      .json({ success: false, message: "Something went wrong!" });
   }
 };
 
@@ -304,11 +330,14 @@ const updateWorkflow = async (req, res) => {
  *             schema:
  *               type: object
  *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 data:
+ *                   $ref: '#/components/schemas/Workflow'
  *                 message:
  *                   type: string
  *                   example: "Workflow status updated successfully"
- *                 updatedWorkflow:
- *                   $ref: '#/components/schemas/Workflow'
  *       400:
  *         description: Bad request - Invalid input data
  *         content:
@@ -342,13 +371,19 @@ const updateWorkflowStatus = async (req, res) => {
       { status },
       { where: { id: workflowId }, returning: true }
     );
-    return res.status(200).json({ message: "Workflow status updated successfully", updatedWorkflow });
+    return res.status(200).json({
+      success: true,
+      data: updatedWorkflow,
+      message: "Workflow status updated successfully",
+    });
   } catch (error) {
     console.error(
       "Error in workflowsController.updateWorkflowStatus - ",
       error
     );
-    return res.status(400).send({ message: "Something went wrong!" });
+    return res
+      .status(400)
+      .json({ success: false, message: "Something went wrong!" });
   }
 };
 
@@ -383,11 +418,14 @@ const updateWorkflowStatus = async (req, res) => {
  *             schema:
  *               type: object
  *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 data:
+ *                   $ref: '#/components/schemas/Workflow'
  *                 message:
  *                   type: string
  *                   example: "Workflow visibility updated successfully"
- *                 updatedWorkflow:
- *                   $ref: '#/components/schemas/Workflow'
  *       400:
  *         description: Bad request - Invalid input data
  *         content:
@@ -421,13 +459,19 @@ const updateWorkflowVisibility = async (req, res) => {
       { visibility },
       { where: { id: workflowId }, returning: true }
     );
-    return res.status(200).json({ message: "Workflow visibility updated successfully", updatedWorkflow });
+    return res.status(200).json({
+      success: true,
+      data: updatedWorkflow,
+      message: "Workflow visibility updated successfully",
+    });
   } catch (error) {
     console.error(
       "Error in workflowsController.updateWorkflowVisibility - ",
       error
     );
-    return res.status(400).send({ message: "Something went wrong!" });
+    return res
+      .status(400)
+      .json({ success: false, message: "Something went wrong!" });
   }
 };
 
@@ -456,6 +500,12 @@ const updateWorkflowVisibility = async (req, res) => {
  *             schema:
  *               type: object
  *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 data:
+ *                   type: null
+ *                   example: null
  *                 message:
  *                   type: string
  *                   example: "Workflow deleted successfully"
@@ -488,16 +538,23 @@ const deleteWorkflow = async (req, res) => {
   try {
     const { workflowId } = req.params;
     await sequelize.transaction(async (t) => {
+      // FIXME: This should not be the case
       await UserWorkflow.destroy({
         where: { userId: req.user.id, workflowId },
         transaction: t,
       });
       await Workflow.destroy({ where: { id: workflowId }, transaction: t });
-      return res.status(200).json({ message: "Workflow deleted successfully" });
+      return res.status(200).json({
+        success: true,
+        data: null,
+        message: "Workflow deleted successfully",
+      });
     });
   } catch (error) {
     console.error("Error in workflowsController.deleteWorkflow - ", error);
-    return res.status(400).send({ message: "Something went wrong!" });
+    return res
+      .status(400)
+      .json({ success: false, message: "Something went wrong!" });
   }
 };
 
@@ -526,7 +583,10 @@ const deleteWorkflow = async (req, res) => {
  *             schema:
  *               type: object
  *               properties:
- *                 workflowNodes:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 data:
  *                   type: array
  *                   items:
  *                     $ref: '#/components/schemas/WorkflowNode'
@@ -561,15 +621,23 @@ const getWorkflowNodes = async (req, res) => {
     const workflowNodes = await WorkflowNode.findAll({
       where: { workflowId },
       include: [
-        { model: Node, attributes: { exclude: ["createdAt", "updatedAt", "deletedAt"] } },
+        {
+          model: Node,
+          attributes: { exclude: ["createdAt", "updatedAt", "deletedAt"] },
+        },
       ],
     });
-    return res.status(200).json({ workflowNodes });
+    return res.status(200).json({
+      success: true,
+      data: workflowNodes,
+    });
   } catch (error) {
     console.error("Error in workflowsController.getWorkflowNodes - ", error);
-    return res.status(400).send({ message: "Something went wrong!" });
+    return res
+      .status(400)
+      .json({ success: false, message: "Something went wrong!" });
   }
-}
+};
 
 /**
  * @swagger
@@ -657,14 +725,17 @@ const getWorkflowNodes = async (req, res) => {
  *             schema:
  *               type: object
  *               properties:
- *                 message:
- *                   type: string
- *                   example: "Workflow node created successfully"
- *                 nodeConfig:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 data:
  *                   oneOf:
  *                     - $ref: '#/components/schemas/ActionNodeConfig'
  *                     - $ref: '#/components/schemas/ConditionNodeConfig'
  *                     - $ref: '#/components/schemas/DelayNodeConfig'
+ *                 message:
+ *                   type: string
+ *                   example: "Workflow node created successfully"
  *       400:
  *         description: Bad request - Invalid input data
  *         content:
@@ -704,16 +775,18 @@ const createWorkflowNode = async (req, res) => {
         { transaction }
       );
       let nodeConfig = null;
-      let dataInclusion = [{
-        model: WorkflowNode,
-        attributes: {
-          exclude: ["createdAt", "updatedAt", "deletedAt"],
+      let dataInclusion = [
+        {
+          model: WorkflowNode,
+          attributes: {
+            exclude: ["createdAt", "updatedAt", "deletedAt"],
+          },
         },
-      }];
+      ];
       switch (nodeData.type) {
         case NODE_TYPE.ACTION:
           let endpointId = get(nodeData, "data.endpointId", null);
-          const endpointData = get(nodeData, 'data.endpoint', null);
+          const endpointData = get(nodeData, "data.endpoint", null);
           const userEndpointObj = {
             userId: req.user.id,
             endpointId,
@@ -728,17 +801,17 @@ const createWorkflowNode = async (req, res) => {
             endpointId = endpoint.id;
             Object.assign(userEndpointObj, {
               endpointId,
-              ...pick(endpointData, [
-                "headers",
-                "body",
-                "authConfig",
-              ]),
+              ...pick(endpointData, ["headers", "body", "authConfig"]),
             });
           }
-          const userEndpoint = await UserEndpoint.create(
-            userEndpointObj,
-            { transaction }
-          );
+          const [userEndpoint] = await UserEndpoint.findOrCreate({
+            where: {
+              userId: req.user.id,
+              endpointId,
+            },
+            defaults: userEndpointObj,
+            transaction,
+          });
           nodeConfig = await ActionNodeConfig.create(
             {
               workflowNodeId: workflowNode.id,
@@ -762,7 +835,7 @@ const createWorkflowNode = async (req, res) => {
           });
           break;
         case NODE_TYPE.CONDITION:
-          nodeConfig = await ConditionNodeConfig.create(
+          nodeConfig = await Rule.create(
             {
               workflowNodeId: workflowNode.id,
               ...pick(nodeData.data, ["expression", "label"]),
@@ -774,7 +847,7 @@ const createWorkflowNode = async (req, res) => {
           nodeConfig = await DelayNodeConfig.create(
             {
               workflowNodeId: workflowNode.id,
-              ...pick(nodeData.data, ["duration"]),
+              ...pick(nodeData.data, ["duration", "unit"]),
             },
             { transaction }
           );
@@ -784,11 +857,127 @@ const createWorkflowNode = async (req, res) => {
         include: dataInclusion,
         transaction,
       });
-      return res.status(201).json({ message: "Workflow node created successfully", nodeConfig });
+      return res.status(201).json({
+        success: true,
+        data: nodeConfig,
+        message: "Workflow node created successfully",
+      });
     });
   } catch (error) {
     console.error("Error in workflowsController.createWorkflowNode - ", error);
-    return res.status(400).send({ message: "Something went wrong!" });
+    return res
+      .status(400)
+      .json({ success: false, message: "Something went wrong!" });
+  }
+};
+
+/**
+ * @swagger
+ * /workflows/{workflowId}/graph:
+ *   get:
+ *     summary: Get workflow graph structure
+ *     description: Retrieves the complete graph structure of a workflow, including all nodes and their connections. Only active connections are included.
+ *     tags: [Workflows]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: workflowId
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: The workflow ID
+ *         example: 1
+ *     responses:
+ *       200:
+ *         description: Successfully retrieved workflow graph
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               required: [success, data]
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                   description: Indicates if the operation was successful
+ *                 data:
+ *                   $ref: '#/components/schemas/WorkflowGraph'
+ *       400:
+ *         description: Bad request
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
+ *       401:
+ *         description: Unauthorized - Invalid or missing token
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
+ *       403:
+ *         description: Forbidden - User doesn't have access to this workflow
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
+ *       404:
+ *         description: Workflow not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
+ */
+const getWorkflowGraph = async (req, res) => {
+  try {
+    const { workflowId } = req.params;
+    await sequelize.transaction(async (transaction) => {
+      const workflowNodes = await WorkflowNode.findAll({
+        where: { workflowId },
+        attributes: {
+          exclude: [
+            "createdAt",
+            "updatedAt",
+            "deletedAt",
+            "nodeId",
+            "workflowId",
+          ],
+        },
+        include: [
+          {
+            model: Node,
+            attributes: { exclude: ["createdAt", "updatedAt", "deletedAt"] },
+          },
+        ],
+        transaction,
+      });
+      const workflowNodeConnections = await WorkflowNodeConnections.findAll({
+        where: { workflowId, isActive: true },
+        attributes: {
+          exclude: [
+            "createdAt",
+            "updatedAt",
+            "deletedAt",
+            "isActive",
+            "workflowId",
+          ],
+        },
+        transaction,
+      });
+      const workflowGraph = {
+        workflowNodes,
+        connections: workflowNodeConnections,
+      };
+      return res.status(200).json({
+        success: true,
+        data: workflowGraph,
+      });
+    });
+  } catch (error) {
+    console.error("Error in workflowsController.getWorkflowGraph - ", error);
+    return res
+      .status(400)
+      .json({ success: false, message: "Something went wrong!" });
   }
 };
 
@@ -802,4 +991,5 @@ module.exports = {
   deleteWorkflow,
   createWorkflowNode,
   getWorkflowNodes,
+  getWorkflowGraph,
 };
