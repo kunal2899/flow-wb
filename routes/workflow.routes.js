@@ -13,15 +13,20 @@ const {
   deleteWorkflow,
   createWorkflowNode,
   getWorkflowNodes,
+  getWorkflowGraph,
 } = require("../controllers/workflows.controller");
 const checkWorkflowAccess = require("../middlewares/checkWorkflowAccess");
 const validateCreateWorkflowNode = require("../middlewares/validators/nodes/validateCreateWorkflowNode");
+const connectionRoutes = require("./connection.routes");
 
 const router = express.Router();
 
 router.param("workflowId", checkWorkflowAccess);
 
+router.use("/:workflowId/connections", connectionRoutes);
+
 router.get("/:workflowId/nodes", getWorkflowNodes);
+router.get("/:workflowId/graph", getWorkflowGraph);
 router.get("/:workflowId", getWorkflow);
 router.get("/", getAllWorkflows);
 
