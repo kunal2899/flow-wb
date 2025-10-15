@@ -32,8 +32,8 @@ const UserWorkflow = sequelize.define(
 
 UserWorkflow.associate = function (models) {
   UserWorkflow.belongsTo(models.user, { foreignKey: "userId" });
-  UserWorkflow.belongsTo(models.workflow, { foreignKey: "workflowId", as: "workflow" });
-  UserWorkflow.hasMany(models.userWorkflowTriggers, {
+  UserWorkflow.belongsTo(models.workflow, { foreignKey: "workflowId" });
+  UserWorkflow.hasMany(models.userWorkflowTrigger, {
     foreignKey: "userWorkflowId",
   });
 };

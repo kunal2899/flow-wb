@@ -7,9 +7,8 @@ const WorkflowExecution = sequelize.define(
   {
     triggerId: {
       type: DataTypes.INTEGER,
-      allowNull: false,
     },
-    userWorkFlowId: {
+    userWorkflowId: {
       type: DataTypes.INTEGER,
       allowNull: false,
     },
@@ -33,16 +32,20 @@ const WorkflowExecution = sequelize.define(
     retryOf: {
       type: DataTypes.INTEGER,
     },
+    currentNodeId: {
+      type: DataTypes.INTEGER,
+      comment: "Currently processing node ID for resume capability"
+    },
   },
   { tableName: "workflow_executions" }
 );
 
 WorkflowExecution.associate = function (models) {
-  WorkflowExecution.belongsTo(models.userWorkflowTriggers, {
+  WorkflowExecution.belongsTo(models.userWorkflowTrigger, {
     foreignKey: "triggerId",
   });
   WorkflowExecution.belongsTo(models.userWorkflow, {
-    foreignKey: "userWorkFlowId",
+    foreignKey: "userWorkflowId",
   });
 };
 

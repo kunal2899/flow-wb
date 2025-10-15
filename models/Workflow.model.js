@@ -33,8 +33,9 @@ const Workflow = sequelize.define(
 );
 
 Workflow.associate = function (models) {
-  Workflow.hasMany(models.userWorkflow, { foreignKey: "workflowId" });
-  Workflow.hasMany(models.workflowNode, { foreignKey: "workflowId" });
+  Workflow.hasMany(models.userWorkflow, { foreignKey: "workflowId", onDelete: "CASCADE" });
+  Workflow.hasMany(models.workflowNode, { foreignKey: "workflowId", onDelete: "CASCADE" });
+  Workflow.hasMany(models.workflowNodeConnection, { foreignKey: "workflowId", onDelete: "CASCADE" });
 };
 
 module.exports = Workflow;

@@ -1,4 +1,5 @@
 const fs = require("fs");
+const { startCase } = require("lodash");
 const path = require("path");
 
 const models = {};
@@ -21,11 +22,21 @@ modelFiles.forEach(file => {
   }
 });
 
-// Setup associations after all models are loaded
-Object.keys(models).forEach(modelName => {
-  if (models[modelName].associate) {
-    models[modelName].associate(models);
+// Setup associations and scopes after all models are loaded
+Object.keys(models).forEach((modelName) => {
+  const model = models[modelName];
+  // Associations
+  if (model.associate) {
+    model.associate(models);
   }
+  // Scopes
+  model.addScope("plain", {
+    raw: true,
+    nest: true,
+  });
+  model.addScope("active", {
+    where: { deletedAt: null },
+  });
 });
 
 module.exports = models;

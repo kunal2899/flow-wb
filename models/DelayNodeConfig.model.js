@@ -1,5 +1,6 @@
 const { DataTypes } = require("sequelize");
 const sequelize = require("../configs/dbConfig");
+const { TIME_UNIT } = require("../constants/common");
 
 const DelayNodeConfig = sequelize.define(
   "delayNodeConfig",
@@ -10,7 +11,13 @@ const DelayNodeConfig = sequelize.define(
     },
     duration: {
       type: DataTypes.INTEGER,
+      allowNull: false,
     },
+    unit: {
+      type: DataTypes.ENUM,
+      values: Object.values(TIME_UNIT),
+      defaultValue: TIME_UNIT.SECONDS,
+    }
   },
   { tableName: "delay_node_configs" }
 );

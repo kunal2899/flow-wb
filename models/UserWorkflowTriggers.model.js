@@ -3,7 +3,7 @@ const sequelize = require("../configs/dbConfig");
 const { USER_WORKFLOW_TRIGGER_TYPE } = require("../constants/userWorkflow");
 
 const UserWorkflowTriggers = sequelize.define(
-  "userWorkflowTriggers",
+  "userWorkflowTrigger",
   {
     userWorkflowId: {
       type: DataTypes.INTEGER,

@@ -42,6 +42,7 @@ const WorkflowNodeExecution = sequelize.define(
     },
     maxAttempts: {
       type: DataTypes.INTEGER,
+      defaultValue: 3,
     },
     backoffStrategy: {
       type: DataTypes.ENUM,
