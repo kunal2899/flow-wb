@@ -1,7 +1,7 @@
 const { Sequelize } = require('sequelize');
 const dotenv = require("dotenv");
 const envConfigs = require("./config.json");
-const initModelDefaultConfig = require('../services/sequelize/initModelDefaultConfig');
+const initModelDefaultConfig = require('../services/coreServices/initModelDefaultConfig');
 
 dotenv.config({ path: ".env", quiet: true});
 const currEnvironment = process.env.NODE_ENV || "development";
