@@ -7,18 +7,9 @@ const validationRules = {
   description: Joi.string(),
   url: Joi.string().pattern(URL_PATTERN),
   method: Joi.string().valid(...Object.values(HTTP_METHOD)),
-  headers: Joi.object().keys({
-    key: Joi.string(),
-    value: Joi.string(),
-  }),
-  body: Joi.object().keys({
-    key: Joi.string(),
-    value: Joi.string(),
-  }),
-  authConfig: Joi.object().keys({
-    key: Joi.string(),
-    value: Joi.string(),
-  }),
+  headers: Joi.object(),
+  body: Joi.object(),
+  authConfig: Joi.object(),
 };
 
 const endpointSchema = {

@@ -1,6 +1,6 @@
 const Joi = require("joi");
 const { NODE_TYPE } = require("../constants/node");
-const { BACKOFF_STRATEGY, HTTP_METHOD } = require("../constants/common");
+const { BACKOFF_STRATEGY, HTTP_METHOD, TIME_UNIT } = require("../constants/common");
 const { pickFields } = require("../utils/joiUtils");
 const { endpointSchema } = require("./endpoint");
 
@@ -27,6 +27,7 @@ const conditionNodeConfigSchema = Joi.object().keys({
 
 const delayNodeConfigSchema = Joi.object().keys({
   duration: Joi.number().required(),
+  unit: Joi.string().valid(...Object.values(TIME_UNIT)),
 });
 
 const validationRules = {
@@ -57,6 +58,11 @@ const createWorkflowNodeSchema = Joi.object().keys({
   ]),
 });
 
+const updateWorkflowNodeSchema = Joi.object().keys({
+  overrideConfig: validationRules.overrideConfig.required(),
+});
+
 module.exports = {
   createWorkflowNodeSchema,
+  updateWorkflowNodeSchema,
 };
