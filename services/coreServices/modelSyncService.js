@@ -1,3 +1,4 @@
+const { flatten } = require("lodash");
 const sequelize = require("../../configs/dbConfig");
 const models = require("../../models");
 require("dotenv").config({ quiet: true });
@@ -12,28 +13,28 @@ const syncModels = async (options = {}) => {
     // Sync order
     const syncLevels = [
       [
-        'User',
-        'Workflow', 
-        'Endpoint',
-        'Node'
+        // 'user',
+        // 'workflow', 
+        // 'endpoint',
+        // 'node'
       ],
       [
-        'UserWorkflow',    // depends on User, Workflow
-        'UserEndpoint',    // depends on User, Endpoint
-        'WorkflowNode'     // depends on Workflow, Node
+        // 'userWorkflow',    // depends on User, Workflow
+        // 'userEndpoint',    // depends on User, Endpoint
+        // 'workflowNode'     // depends on Workflow, Node
       ],
       [
-        'UserWorkflowTriggers',  // depends on UserWorkflow
-        'ActionNodeConfig',      // depends on WorkflowNode, UserEndpoint
-        'DelayNodeConfig',       // depends on WorkflowNode
-        'ConditionNodeConfig'    // depends on WorkflowNode
+        // 'userWorkflowTrigger',  // depends on UserWorkflow
+        // 'actionNodeConfig',      // depends on WorkflowNode, UserEndpoint
+        // 'delayNodeConfig',       // depends on WorkflowNode
+        // 'rule'                   // depends on WorkflowNode
       ],
       [
-        'WorkflowExecution',     // depends on UserWorkflowTriggers, UserWorkflow
-        'WorkflowNodeConnections' // depends on WorkflowNode, ConditionNodeConfig
+        'workflowExecution',     // depends on UserWorkflowTriggers, UserWorkflow
+        // 'workflowNodeConnection' // depends on WorkflowNode, ConditionNodeConfig
       ],
       [
-        'WorkflowNodeExecution'  // depends on WorkflowExecution, WorkflowNode
+        // 'workflowNodeExecution'  // depends on WorkflowExecution, WorkflowNode
       ],
     ];
     
@@ -44,17 +45,17 @@ const syncModels = async (options = {}) => {
       for (const modelName of levelModels) {
         if (models[modelName]) {
           await models[modelName].sync(syncOptions);
-          const action = force ? '(recreated)' : alter ? '(altered)' : '(synced)';
-          console.log(`✓ ${modelName} table ${action}`);
+          const action = force ? 'recreated' : alter ? 'altered' : 'synced';
+          console.log(`✅ ${modelName} table ${action}`);
         } else {
-          console.warn(`Model ${modelName} not found`);
+          console.warn(`⚠️  Model ${modelName} not found`);
         }
       }
     }
 
-    if (syncLevels.length === 0) {
-      sequelize.sync();
-    }
+    // if (flatten(syncLevels).length === 0) {
+    //   sequelize.sync();
+    // }
     
     console.log('All models synced successfully in dependency order!');
   } catch (error) {
