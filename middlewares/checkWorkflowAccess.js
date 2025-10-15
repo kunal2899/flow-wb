@@ -1,3 +1,4 @@
+const { USER_WORKFLOW_ROLE } = require("../constants/userWorkflow");
 const UserWorkflow = require("../models/UserWorkflow.model");
 const Workflow = require("../models/Workflow.model");
 
@@ -14,6 +15,7 @@ const checkWorkflowAccess = async (req, res, next) => {
       where: {
         workflowId,
         userId,
+        role: USER_WORKFLOW_ROLE.OWNER,
       },
       attributes: {
         exclude: ["workflowId", "createdAt", "updatedAt", "deletedAt"],
@@ -32,7 +34,7 @@ const checkWorkflowAccess = async (req, res, next) => {
     }
 
     req.userWorkflow = userWorkflow;
-
+    console.log({ workflowIdAtWOrkflow: workflowId })
     next();
   } catch (error) {
     console.error("Error in middlewares.checkWorkflowAccess - ", error);
