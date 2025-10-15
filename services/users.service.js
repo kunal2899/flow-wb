@@ -1,14 +1,14 @@
-const { User } = require("../models");
 const jwt = require("jsonwebtoken");
 const { pick } = require("lodash");
 const { validateHash } = require("../utils/bcryptUtils");
 const { getFullName } = require("../utils/users");
+const User = require("../models/User.model");
 require("dotenv").config({ quiet: true });
 
 const authenticateUser = async ({ type, data }) => {
   switch (type) {
-    case 'email':
-      return authenticateUserByEmail(pick(data, 'email', 'password'));
+    case "email":
+      return authenticateUserByEmail(pick(data, "email", "password"));
     default:
       throw new Error("Invalid authentication type");
   }
@@ -28,7 +28,11 @@ const authenticateUserByEmail = async ({ email, password }) => {
     process.env.JWT_SECRET,
     { expiresIn: "24h" }
   );
-  return { success: true, token };
+  return {
+    success: true,
+    data: { token },
+    message: "Login successful",
+  };
 };
 
 module.exports = { authenticateUser };
