@@ -4,6 +4,13 @@ const NODE_TYPE = {
   DELAY: "delay",
 };
 
+const ON_ERROR_ACTION = {
+  CONTINUE: "continue",
+  STOP: "stop",
+  RETRY: "retry",
+}
+
 module.exports = {
   NODE_TYPE,
+  ON_ERROR_ACTION,
 }

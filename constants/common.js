@@ -18,9 +18,21 @@ const BACKOFF_STRATEGY = {
 
 const URL_PATTERN = /^(https?:\/\/)?(localhost|\w+(\.\w+)+)(:\d+)?(\/[^\s]*)?$/;
 
+const MAIN_QUEUE_NAME = "workflow-queue";
+
+const TIME_UNIT = {
+  MILLISECONDS: "milliseconds",
+  SECONDS: "seconds",
+  MINUTES: "minutes",
+  HOURS: "hours",
+  DAYS: "days",
+};
+
 module.exports = {
   VISIBILITY_OPTION,
   HTTP_METHOD,
   BACKOFF_STRATEGY,
   URL_PATTERN,
+  MAIN_QUEUE_NAME,
+  TIME_UNIT,
 };
