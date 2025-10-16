@@ -13,7 +13,6 @@ const jobPayloadSchema = Joi.object().keys({
     then: Joi.required(),
     otherwise: Joi.optional(),
   }),
-  isResume: Joi.boolean(),
 });
 
 const validateJobPayload = payload => {

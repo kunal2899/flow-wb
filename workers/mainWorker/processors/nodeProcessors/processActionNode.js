@@ -28,7 +28,7 @@ const processActionNode = async (workflowNode, globalContext) => {
         attributes: ["userEndpointId"],
       });
       if (!actionNodeConfig) throw new Error("Invalid action node config");
-    
+
       userEndpoint = actionNodeConfig.userEndpoint;
       await redisCacheService.set(cacheKey, userEndpoint, 60 * 60 * 24);
     }
@@ -45,7 +45,13 @@ const processActionNode = async (workflowNode, globalContext) => {
     } = userEndpoint;
     const requestHeaders = { ...endpointHeaders, ...headers };
     const requestBody = { ...endpointBody, ...body };
-    const request = { url, method, headers: requestHeaders, body: requestBody, authConfig };
+    const request = {
+      url,
+      method,
+      headers: requestHeaders,
+      body: requestBody,
+      authConfig,
+    };
     const outputData = await makeApiCall(request);
     return pick(outputData, ["success", "data", "error"]);
   } catch (error) {

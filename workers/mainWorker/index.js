@@ -3,7 +3,6 @@ const { MAIN_QUEUE_NAME } = require("../../constants/common");
 const { has } = require("lodash");
 const processWorkflow = require("./processors/processWorkflow");
 const { getRedisConnection } = require("../../configs/redisConfig");
-// const runtimeStateManager = require("./states/runtimeStateManager");
 
 const connection = getRedisConnection();
 
@@ -61,7 +60,6 @@ const init = async () => {
       }
     }, 100);
     await worker.run();
-    // await runtimeStateManager.resumePendingExecutions();
   } catch (error) {
     console.error("Error in initializing main worker - ", error);
   }

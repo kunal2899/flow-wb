@@ -1,9 +1,9 @@
 const { Promise } = require("bluebird");
 const { convertTimeToMs } = require("../../../../utils/timeUtils");
 const workflowQueue = require("../../../../services/queueServices/workflowQueue.service");
-const { WORKFLOW_NODE_EXECUTION_STATUS } = require("../../../../constants/workflowExecution");
-const { findIndex } = require("lodash");
-const runtimeStateManager = require("../../states/runtimeStateManager");
+const {
+  WORKFLOW_NODE_EXECUTION_STATUS,
+} = require("../../../../constants/workflowExecution");
 
 const scheduleDelayNodeSuccessors = async ({
   workflowExecutionId,
@@ -12,7 +12,6 @@ const scheduleDelayNodeSuccessors = async ({
   nextNodes,
   globalContext,
   nodeExecution,
-  // nodeQueue,
 }) => {
   try {
     const delayNodeConfig = await DelayNodeConfig.findOne({
@@ -22,22 +21,26 @@ const scheduleDelayNodeSuccessors = async ({
     if (!delayNodeConfig) throw new Error("Invalid delay node config");
     const { duration, unit } = delayNodeConfig;
     const delayInMs = convertTimeToMs(duration, unit);
-    await Promise.map(nextNodes, async (nextNode) => {
-      await WorkflowNodeExecution.create({
-        workflowExecutionId,
-        workflowNodeId: nextNode.id,
-        status: WORKFLOW_NODE_EXECUTION_STATUS.QUEUED,
-      });
-      await workflowQueue.enqueueWorkflowJob(
-        {
+    await Promise.map(
+      nextNodes,
+      async (nextNode) => {
+        await WorkflowNodeExecution.create({
           workflowExecutionId,
-          userWorkflowId,
-          startNodeId: nextNode.id,
-          globalContext,
-        },
-        { delay: delayInMs }
-      );
-    }, { concurrency: 3 });
+          workflowNodeId: nextNode.id,
+          status: WORKFLOW_NODE_EXECUTION_STATUS.QUEUED,
+        });
+        await workflowQueue.enqueueWorkflowJob(
+          {
+            workflowExecutionId,
+            userWorkflowId,
+            startNodeId: nextNode.id,
+            globalContext,
+          },
+          { delay: delayInMs }
+        );
+      },
+      { concurrency: 3 }
+    );
     Object.assign(nodeExecution, {
       output: {
         willResumeAt: new Date(Date.now() + delayInMs + 5.5 * 60 * 60 * 1000)
@@ -48,14 +51,6 @@ const scheduleDelayNodeSuccessors = async ({
       status: WORKFLOW_NODE_EXECUTION_STATUS.COMPLETED,
       endedAt: new Date(),
     });
-    // await runtimeStateManager.removeNodeFromQueue(
-    //   workflowExecutionId,
-    //   workflowNodeId
-    // );
-    // nodeQueue = nodeQueue.splice(
-    //   findIndex(nodeQueue, { id: workflowNodeId }),
-    //   1
-    // );
   } catch (error) {
     console.error(
       "Error in nodeProcessors.scheduleDelayNodeSuccessors - ",

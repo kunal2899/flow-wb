@@ -1,4 +1,6 @@
-const { evaluateLogicWithJsonPath } = require("../../../../utils/jsonPathLogic");
+const {
+  evaluateLogicWithJsonPath,
+} = require("../../../../utils/jsonPathLogic");
 const redisCacheService = require("../../../../services/coreServices/redisCache.service");
 const { isNil } = require("lodash");
 

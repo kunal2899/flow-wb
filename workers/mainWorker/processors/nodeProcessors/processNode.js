@@ -6,11 +6,7 @@ const {
 const processActionNode = require("./processActionNode");
 const processConditionNode = require("./processConditionNode");
 
-const processNode = async ({
-  nodeExecution,
-  workflowNode,
-  globalContext,
-}) => {
+const processNode = async ({ nodeExecution, workflowNode, globalContext }) => {
   try {
     const {
       id: workflowNodeId,

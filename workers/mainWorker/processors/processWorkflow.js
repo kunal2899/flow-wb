@@ -6,7 +6,6 @@ const { isNull, has, some, set } = require("lodash");
 const validateJobPayload = require("../validators/validateJobPayload");
 const processNodesWithQueue = require("./coreProcessors/processNodesWithQueue");
 const { Op } = require("sequelize");
-const { updateGlobalContext } = require("../helpers/globalContext");
 
 const processWorkflow = async (job) => {
   try {
@@ -18,7 +17,6 @@ const processWorkflow = async (job) => {
         nodes: {},
         workflow: {},
       },
-      isResume = false,
     } = job.data;
 
     validateJobPayload(job.data);
@@ -29,7 +27,7 @@ const processWorkflow = async (job) => {
 
     if (!workflowExecution) throw new Error("Invalid workflow execution");
     
-    if (!isResume && workflowExecution.status === WORKFLOW_EXECUTION_STATUS.RUNNING) {
+    if (workflowExecution.status === WORKFLOW_EXECUTION_STATUS.RUNNING) {
       return {
         type: "warning",
         message: `Workflow execution (id: ${workflowExecutionId}) already running`,
@@ -46,14 +44,6 @@ const processWorkflow = async (job) => {
     const { workflowId } = workflowExecution.userWorkflow;
 
     if (isNull(startNodeId)) {
-      // updateGlobalContext({
-      //   workflowExecutionId,
-      //   globalContext,
-      //   key: "nodes.trigger",
-      //   data: {
-      //     ...workflowExecution.triggerPayload,
-      //   },
-      // });
       set(globalContext, "nodes.trigger", {
         ...workflowExecution.triggerPayload,
       });
@@ -65,7 +55,6 @@ const processWorkflow = async (job) => {
       globalContext,
       workflowExecutionId,
       userWorkflowId,
-      isResume,
     });
 
     const activeNodes = await WorkflowNodeExecution.findAll({
