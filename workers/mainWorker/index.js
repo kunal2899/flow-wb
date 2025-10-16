@@ -61,7 +61,7 @@ const init = async () => {
       }
     }, 100);
     await worker.run();
-    // await runtimeStateManager.resumePendingExecutions();
+    await runtimeStateManager.resumePendingExecutions();
   } catch (error) {
     console.error("Error in initializing main worker - ", error);
   }

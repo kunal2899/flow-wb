@@ -1,7 +1,7 @@
 const { set } = require("lodash");
 const runtimeStateManager = require("../states/runtimeStateManager");
 
-const updateGlobalContext = ({
+const updateGlobalContext = async ({
   workflowExecutionId,
   globalContext,
   key,
@@ -9,7 +9,7 @@ const updateGlobalContext = ({
 }) => {
   try {
     set(globalContext, key, data);
-    runtimeStateManager.setExecutionContext(
+    await runtimeStateManager.setExecutionContext(
       workflowExecutionId,
       JSON.stringify(globalContext)
     );

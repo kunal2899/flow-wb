@@ -46,16 +46,13 @@ const processWorkflow = async (job) => {
     const { workflowId } = workflowExecution.userWorkflow;
 
     if (isNull(startNodeId)) {
-      // updateGlobalContext({
-      //   workflowExecutionId,
-      //   globalContext,
-      //   key: "nodes.trigger",
-      //   data: {
-      //     ...workflowExecution.triggerPayload,
-      //   },
-      // });
-      set(globalContext, "nodes.trigger", {
-        ...workflowExecution.triggerPayload,
+      await updateGlobalContext({
+        workflowExecutionId,
+        globalContext,
+        key: "nodes.trigger",
+        data: {
+          ...workflowExecution.triggerPayload,
+        },
       });
     }
 

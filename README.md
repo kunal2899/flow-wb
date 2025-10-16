@@ -28,6 +28,22 @@ The API documentation includes the following endpoints:
 - `GET /v1/workflows/{workflowId}/nodes` - Get all nodes in a workflow
 - `POST /v1/workflows/{workflowId}/nodes` - Create a new node in a workflow
 
+#### Individual Node Endpoints
+- `GET /v1/nodes/{workflowNodeId}` - Get a specific workflow node
+- `PUT /v1/nodes/{workflowNodeId}` - Update a workflow node configuration
+- `DELETE /v1/nodes/{workflowNodeId}` - Delete a workflow node
+
+#### Node Connection Endpoints
+- `POST /v1/connections` - Create a connection between workflow nodes
+- `PUT /v1/connections/{connectionId}` - Update a workflow node connection
+- `PATCH /v1/connections/{connectionId}/status` - Activate/deactivate a connection
+- `DELETE /v1/connections/{connectionId}` - Delete a workflow node connection
+
+Node connections define the flow between nodes in a workflow:
+- Connect nodes to create execution paths
+- Support conditional branching with rule IDs
+- Enable/disable connections to control workflow execution
+
 #### Node Types Supported
 - **Action Nodes**: Execute HTTP requests to external APIs
 - **Condition Nodes**: Add conditional logic to workflows

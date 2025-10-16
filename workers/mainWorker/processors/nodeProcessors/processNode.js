@@ -5,6 +5,7 @@ const {
 } = require("../../../../constants/workflowExecution");
 const processActionNode = require("./processActionNode");
 const processConditionNode = require("./processConditionNode");
+const { updateGlobalContext } = require("../../helpers/globalContext");
 
 const processNode = async ({
   nodeExecution,
@@ -30,12 +31,22 @@ const processNode = async ({
         const output = await processActionNode(workflowNode, globalContext);
         if (output.success) {
           nodeExecution.output = output.data;
-          globalContext.nodes[`wn_${workflowNodeId}`] = output;
+          await updateGlobalContext({
+            workflowExecutionId,
+            globalContext,
+            key: `nodes.wn_${workflowNodeId}`,
+            data: output,
+          });
         } else {
           switch (onErrorAction) {
             case ON_ERROR_ACTION.CONTINUE:
               nodeExecution.output = pick(output, "error");
-              globalContext.nodes[`wn_${workflowNodeId}`] = output;
+              await updateGlobalContext({
+                workflowExecutionId,
+                globalContext,
+                key: `nodes.wn_${workflowNodeId}`,
+                data: output,
+              });
               break;
             case ON_ERROR_ACTION.STOP:
             default:
@@ -61,7 +72,12 @@ const processNode = async ({
           status: WORKFLOW_NODE_EXECUTION_STATUS.COMPLETED,
           endedAt: new Date(),
         });
-        globalContext.nodes[`wn_${workflowNodeId}`] = { matchedRuleIds };
+        await updateGlobalContext({
+          workflowExecutionId,
+          globalContext,
+          key: `nodes.wn_${workflowNodeId}`,
+          data: { matchedRuleIds },
+        });
         break;
     }
   } catch (error) {
