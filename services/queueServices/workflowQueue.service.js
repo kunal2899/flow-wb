@@ -9,7 +9,7 @@ class WorkflowQueue {
 
   enqueueWorkflowJob = (payload, options = {}) =>
     this.workflowQueue.addJob(
-      `wf-${payload.workflowExecutionId}`,
+      'workflow',
       payload,
       options
     );
@@ -19,6 +19,8 @@ class WorkflowQueue {
   getWorkflowJobs = () => this.workflowQueue.getJobs();
 
   getDelayedJobs = async () => this.workflowQueue.getDelayedJobs();
+
+  removeWorkflowJob = (jobId) => this.workflowQueue.removeJob(jobId);
 
   _getQueueInstance = () => this.workflowQueue._getQueueInstance();
 }
