@@ -36,6 +36,10 @@ class BaseQueue {
     return this.queue.getDelayed();
   }
 
+  removeJob(jobId) {
+    return this.queue.remove(jobId);
+  }
+
   _getQueueInstance() {
     return this.queue;
   }

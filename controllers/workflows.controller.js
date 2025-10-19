@@ -16,136 +16,6 @@ const WorkflowNodeConnections = require("../models/WorkflowNodeConnections.model
 /**
  * @swagger
  * /workflows:
- *   get:
- *     summary: Get all workflows for the authenticated user
- *     description: Retrieves all workflows associated with the authenticated user
- *     tags: [Workflows]
- *     security:
- *       - bearerAuth: []
- *     responses:
- *       200:
- *         description: Successfully retrieved workflows
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 success:
- *                   type: boolean
- *                   example: true
- *                 data:
- *                   type: array
- *                   items:
- *                     $ref: '#/components/schemas/UserWorkflow'
- *       400:
- *         description: Bad request
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/ErrorResponse'
- *       401:
- *         description: Unauthorized - Invalid or missing token
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/ErrorResponse'
- */
-const getAllWorkflows = async (req, res) => {
-  try {
-    const { id: userId } = req.user;
-    const userWorkflows = await UserWorkflow.findAll({
-      where: {
-        userId,
-      },
-      attributes: {
-        exclude: ["workflowId", "createdAt", "updatedAt", "deletedAt"],
-      },
-      include: [
-        {
-          model: Workflow,
-          as: "workflow",
-          attributes: { exclude: ["createdAt", "updatedAt", "deletedAt"] },
-        },
-      ],
-    });
-    return res.status(200).json({ success: true, data: userWorkflows });
-  } catch (error) {
-    console.error("Error in workflowsController.getAllWorkflows - ", error);
-    return res
-      .status(400)
-      .send({ success: false, message: "Something went wrong!" });
-  }
-};
-
-/**
- * @swagger
- * /workflows/{workflowId}:
- *   get:
- *     summary: Get a specific workflow by ID
- *     description: Retrieves a specific workflow by its ID. The user must have access to this workflow.
- *     tags: [Workflows]
- *     security:
- *       - bearerAuth: []
- *     parameters:
- *       - in: path
- *         name: workflowId
- *         required: true
- *         schema:
- *           type: integer
- *         description: The workflow ID
- *         example: 1
- *     responses:
- *       200:
- *         description: Successfully retrieved workflow
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 success:
- *                   type: boolean
- *                   example: true
- *                 data:
- *                   $ref: '#/components/schemas/UserWorkflow'
- *       400:
- *         description: Bad request
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/ErrorResponse'
- *       401:
- *         description: Unauthorized - Invalid or missing token
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/ErrorResponse'
- *       403:
- *         description: Forbidden - User doesn't have access to this workflow
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/ErrorResponse'
- *       404:
- *         description: Workflow not found
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/ErrorResponse'
- */
-const getWorkflow = async (req, res) => {
-  try {
-    return res.status(200).json({ success: true, data: req.userWorkflow });
-  } catch (error) {
-    console.error("Error in workflowsController.getWorkflow - ", error);
-    return res
-      .status(400)
-      .send({ success: false, message: "Something went wrong!" });
-  }
-};
-
-/**
- * @swagger
- * /workflows:
  *   post:
  *     summary: Create a new workflow
  *     description: Creates a new workflow and associates it with the authenticated user
@@ -538,11 +408,6 @@ const deleteWorkflow = async (req, res) => {
   try {
     const { workflowId } = req.params;
     await sequelize.transaction(async (t) => {
-      // FIXME: This should not be the case
-      await UserWorkflow.destroy({
-        where: { userId: req.user.id, workflowId },
-        transaction: t,
-      });
       await Workflow.destroy({ where: { id: workflowId }, transaction: t });
       return res.status(200).json({
         success: true,
@@ -982,8 +847,6 @@ const getWorkflowGraph = async (req, res) => {
 };
 
 module.exports = {
-  getAllWorkflows,
-  getWorkflow,
   createWorkflow,
   updateWorkflow,
   updateWorkflowStatus,
