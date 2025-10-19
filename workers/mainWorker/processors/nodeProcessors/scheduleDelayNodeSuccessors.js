@@ -4,6 +4,7 @@ const workflowQueue = require("../../../../services/queueServices/workflowQueue.
 const {
   WORKFLOW_NODE_EXECUTION_STATUS,
 } = require("../../../../constants/workflowExecution");
+const abortForCancelledNode = require("../../helpers/abortForCancelledNode");
 
 const scheduleDelayNodeSuccessors = async ({
   workflowExecutionId,
@@ -13,6 +14,7 @@ const scheduleDelayNodeSuccessors = async ({
   globalContext,
   nodeExecution,
 }) => {
+  const updateData = {};
   try {
     const delayNodeConfig = await DelayNodeConfig.findOne({
       where: { workflowNodeId },
@@ -24,6 +26,7 @@ const scheduleDelayNodeSuccessors = async ({
     await Promise.map(
       nextNodes,
       async (nextNode) => {
+        await abortForCancelledNode(nodeExecution);
         await WorkflowNodeExecution.create({
           workflowExecutionId,
           workflowNodeId: nextNode.id,
@@ -36,12 +39,15 @@ const scheduleDelayNodeSuccessors = async ({
             startNodeId: nextNode.id,
             globalContext,
           },
-          { delay: delayInMs }
+          {
+            jobId: `wf-${workflowExecutionId}-delay-${nextNode.id}`,
+            delay: delayInMs,
+          }
         );
       },
       { concurrency: 3 }
     );
-    Object.assign(nodeExecution, {
+    Object.assign(updateData, {
       output: {
         willResumeAt: new Date(Date.now() + delayInMs + 5.5 * 60 * 60 * 1000)
           .toISOString()
@@ -56,14 +62,20 @@ const scheduleDelayNodeSuccessors = async ({
       "Error in nodeProcessors.scheduleDelayNodeSuccessors - ",
       error
     );
-    Object.assign(nodeExecution, {
+    Object.assign(updateData, {
       status: WORKFLOW_NODE_EXECUTION_STATUS.FAILED,
       endedAt: new Date(),
       reason: error.message,
     });
     throw error;
   } finally {
-    if (nodeExecution) await nodeExecution.save();
+    await nodeExecution.reload();
+    if (
+      nodeExecution &&
+      nodeExecution.status !== WORKFLOW_NODE_EXECUTION_STATUS.CANCELLED
+    ) {
+      await nodeExecution.update(updateData);
+    }
   }
 };
 

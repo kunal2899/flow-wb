@@ -2,7 +2,7 @@ const {
   WORKFLOW_EXECUTION_STATUS,
   WORKFLOW_NODE_EXECUTION_STATUS,
 } = require("../../../constants/workflowExecution");
-const { isNull, has, some, set } = require("lodash");
+const { isNull, has, some, set, pick } = require("lodash");
 const validateJobPayload = require("../validators/validateJobPayload");
 const processNodesWithQueue = require("./coreProcessors/processNodesWithQueue");
 const { Op } = require("sequelize");
@@ -27,10 +27,18 @@ const processWorkflow = async (job) => {
 
     if (!workflowExecution) throw new Error("Invalid workflow execution");
     
-    if (workflowExecution.status === WORKFLOW_EXECUTION_STATUS.RUNNING) {
+    if (
+      [
+        WORKFLOW_EXECUTION_STATUS.RUNNING,
+        WORKFLOW_EXECUTION_STATUS.STOPPED,
+      ].includes(workflowExecution.status)
+    ) {
       return {
         type: "warning",
-        message: `Workflow execution (id: ${workflowExecutionId}) already running`,
+        message: `
+          Status for workflow execution (id: ${workflowExecutionId}) 
+          is ${workflowExecution.status}. Skipping processing.
+        `,
       };
     }
 
@@ -53,7 +61,7 @@ const processWorkflow = async (job) => {
       startNodeId,
       workflowId,
       globalContext,
-      workflowExecutionId,
+      workflowExecution,
       userWorkflowId,
     });
 
@@ -70,27 +78,33 @@ const processWorkflow = async (job) => {
       attributes: ["status"],
     });
 
+    const updateData = {};
+
     if (activeNodes.length > 0) {
       if (
         some(activeNodes, { status: WORKFLOW_NODE_EXECUTION_STATUS.PAUSED })
       ) {
-        workflowExecution.status = WORKFLOW_EXECUTION_STATUS.PAUSED;
+        updateData.status = WORKFLOW_EXECUTION_STATUS.PAUSED;
       } else if (
         some(activeNodes, { status: WORKFLOW_NODE_EXECUTION_STATUS.STOPPED })
       ) {
-        workflowExecution.status = WORKFLOW_EXECUTION_STATUS.STOPPED;
+        updateData.status = WORKFLOW_EXECUTION_STATUS.STOPPED;
       } else {
-        workflowExecution.status = WORKFLOW_EXECUTION_STATUS.PENDING;
+        updateData.status = WORKFLOW_EXECUTION_STATUS.PENDING;
       }
     } else {
-      Object.assign(workflowExecution, {
+      Object.assign(updateData, {
         status: WORKFLOW_EXECUTION_STATUS.COMPLETED,
         endedAt: new Date(),
       });
     }
-    await workflowExecution.save();
+    await workflowExecution.reload();
+    if (workflowExecution.status !== WORKFLOW_EXECUTION_STATUS.STOPPED) {
+      await workflowExecution.update(updateData);
+    }
   } catch (error) {
     console.error("Error in processors.processWorkflow - ", error);
+    if (error.code === "WF-ABORT") throw error;
     await WorkflowExecution.update(
       {
         status: WORKFLOW_EXECUTION_STATUS.FAILED,

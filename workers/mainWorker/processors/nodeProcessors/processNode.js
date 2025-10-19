@@ -5,8 +5,10 @@ const {
 } = require("../../../../constants/workflowExecution");
 const processActionNode = require("./processActionNode");
 const processConditionNode = require("./processConditionNode");
+const abortForCancelledNode = require("../../helpers/abortForCancelledNode");
 
 const processNode = async ({ nodeExecution, workflowNode, globalContext }) => {
+  const updateData = {};
   try {
     const {
       id: workflowNodeId,
@@ -14,6 +16,8 @@ const processNode = async ({ nodeExecution, workflowNode, globalContext }) => {
       prevNode = "trigger",
       onErrorAction,
     } = workflowNode;
+
+    await abortForCancelledNode(nodeExecution);
 
     await nodeExecution.update({
       status: WORKFLOW_NODE_EXECUTION_STATUS.RUNNING,
@@ -23,14 +27,14 @@ const processNode = async ({ nodeExecution, workflowNode, globalContext }) => {
 
     switch (currentNode.type) {
       case NODE_TYPE.ACTION:
-        const output = await processActionNode(workflowNode, globalContext);
+        const output = await processActionNode(nodeExecution, workflowNode, globalContext);
         if (output.success) {
-          nodeExecution.output = output.data;
+          updateData.output = output.data;
           globalContext.nodes[`wn_${workflowNodeId}`] = output;
         } else {
           switch (onErrorAction) {
             case ON_ERROR_ACTION.CONTINUE:
-              nodeExecution.output = pick(output, "error");
+              updateData.output = pick(output, "error");
               globalContext.nodes[`wn_${workflowNodeId}`] = output;
               break;
             case ON_ERROR_ACTION.STOP:
@@ -42,7 +46,7 @@ const processNode = async ({ nodeExecution, workflowNode, globalContext }) => {
               throw { ...output.error, type: "ACTION_API_ERROR" };
           }
         }
-        Object.assign(nodeExecution, {
+        Object.assign(updateData, {
           status: WORKFLOW_NODE_EXECUTION_STATUS.COMPLETED,
           endedAt: new Date(),
         });
@@ -52,7 +56,7 @@ const processNode = async ({ nodeExecution, workflowNode, globalContext }) => {
           workflowNode,
           globalContext
         );
-        Object.assign(nodeExecution, {
+        Object.assign(updateData, {
           output: { matchedRuleIds },
           status: WORKFLOW_NODE_EXECUTION_STATUS.COMPLETED,
           endedAt: new Date(),
@@ -61,6 +65,7 @@ const processNode = async ({ nodeExecution, workflowNode, globalContext }) => {
         break;
     }
   } catch (error) {
+    if (error.code === "WF-ABORT") throw error;
     await nodeExecution.update({
       status: WORKFLOW_NODE_EXECUTION_STATUS.FAILED,
       endedAt: new Date(),
@@ -71,7 +76,13 @@ const processNode = async ({ nodeExecution, workflowNode, globalContext }) => {
     }
     throw error;
   } finally {
-    await nodeExecution?.save?.();
+    await nodeExecution.reload();
+    if (
+      nodeExecution &&
+      nodeExecution.status !== WORKFLOW_NODE_EXECUTION_STATUS.CANCELLED
+    ) {
+      await nodeExecution.update(updateData);
+    }
   }
 };
 

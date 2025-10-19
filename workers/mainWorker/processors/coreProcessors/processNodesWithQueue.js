@@ -6,16 +6,19 @@ const processNode = require("../nodeProcessors/processNode");
 const scheduleDelayNodeSuccessors = require("../nodeProcessors/scheduleDelayNodeSuccessors");
 const {
   WORKFLOW_NODE_EXECUTION_STATUS,
+  WORKFLOW_EXECUTION_STATUS,
 } = require("../../../../constants/workflowExecution");
+const WorkflowNodeExecution = require("../../../../models/WorkflowNodeExecution.model");
 
 const processNodesWithQueue = async ({
   startNodeId,
   workflowId,
   globalContext,
-  workflowExecutionId,
+  workflowExecution,
   userWorkflowId,
 }) => {
   try {
+    const { id: workflowExecutionId } = workflowExecution;
     let nodeQueue = [];
     const startNode = await getStartNode({
       startNodeId,
@@ -46,6 +49,14 @@ const processNodesWithQueue = async ({
               status: WORKFLOW_NODE_EXECUTION_STATUS.QUEUED,
             },
           });
+
+          await workflowExecution.reload();
+          
+          if (workflowExecution.status === WORKFLOW_EXECUTION_STATUS.STOPPED) {
+            const error = new Error("Workflow execution has been stopped");
+            error.code = "WF-ABORT";
+            throw error;
+          }
 
           await processNode({
             nodeExecution,

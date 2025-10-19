@@ -2,8 +2,9 @@ const { replaceJsonPathVars } = require("../../../../utils/jsonPathLogic");
 const redisCacheService = require("../../../../services/coreServices/redisCache.service");
 const { isNil, pick } = require("lodash");
 const makeApiCall = require("../../helpers/makeApiCall");
+const abortForCancelledNode = require("../../helpers/abortForCancelledNode");
 
-const processActionNode = async (workflowNode, globalContext) => {
+const processActionNode = async (nodeExecution, workflowNode, globalContext) => {
   try {
     const { id: workflowNodeId } = workflowNode;
     const cacheKey = `nodeConfig:${workflowNodeId}`;
@@ -52,6 +53,7 @@ const processActionNode = async (workflowNode, globalContext) => {
       body: requestBody,
       authConfig,
     };
+    await abortForCancelledNode(nodeExecution);
     const outputData = await makeApiCall(request);
     return pick(outputData, ["success", "data", "error"]);
   } catch (error) {
