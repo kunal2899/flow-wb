@@ -1,8 +1,8 @@
 const Joi = require('joi');
-const { VISIBILITY_OPTION } = require('../constants/common');
-const { WORKFLOW_STATUS } = require('../constants/workflow');
-const { pickFields } = require('../utils/joiUtils');
-const { USER_WORKFLOW_ROLE } = require('../constants/userWorkflow');
+const { VISIBILITY_OPTION } = require('@constants/common');
+const { WORKFLOW_STATUS } = require('@constants/workflow');
+const { pickFields } = require('@utils/joiUtils');
+const { USER_WORKFLOW_ROLE } = require('@constants/userWorkflow');
 
 const validationRules = {
   name: Joi.string(),

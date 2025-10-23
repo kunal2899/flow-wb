@@ -1,7 +1,7 @@
 const { DataTypes } = require("sequelize");
-const sequelize = require("../configs/dbConfig");
-const { VISIBILITY_OPTION } = require("../constants/common");
-const { WORKFLOW_STATUS } = require("../constants/workflow");
+const sequelize = require("@configs/dbConfig");
+const { VISIBILITY_OPTION } = require("@constants/common");
+const { WORKFLOW_STATUS } = require("@constants/workflow");
 
 const Workflow = sequelize.define(
   "workflow",

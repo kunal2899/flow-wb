@@ -4,12 +4,12 @@ const {
   updateConnection,
   deleteConnection,
   updateConnectionStatus,
-} = require("../controllers/connections.controller");
+} = require("@controllers/connections.controller");
 const {
   validateConnection,
   validateConnectionStatus,
-} = require("../middlewares/validators/workflows/validateConnection");
-const checkConnectionExistence = require("../middlewares/checkConnectionExistence");
+} = require("@middlewares/validators/workflows/validateConnection");
+const checkConnectionExistence = require("@middlewares/checkConnectionExistence");
 
 const router = express.Router({ mergeParams: true });
 

@@ -1,4 +1,4 @@
-const WorkflowNode = require("../models/WorkflowNode.model");
+const WorkflowNode = require("@models/WorkflowNode.model");
 
 const checkConnectionValidity = async (
   sourceNodeId,

@@ -1,6 +1,10 @@
 const express = require("express");
-const { getExecutionLog, getExecutionsHistory, stopWorkflowExecution } = require("../controllers/workflowExecutions.controller");
-const checkWorkflowExecutionExistence = require("../middlewares/checkWorkflowExecutionExistence");
+const {
+  getExecutionLog,
+  getExecutionsHistory,
+  stopWorkflowExecution,
+} = require("@controllers/workflowExecutions.controller");
+const checkWorkflowExecutionExistence = require("@middlewares/checkWorkflowExecutionExistence");
 const router = express.Router({ mergeParams: true });
 
 router.param("workflowExecutionId", checkWorkflowExecutionExistence);

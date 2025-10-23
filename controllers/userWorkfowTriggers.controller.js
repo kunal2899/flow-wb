@@ -1,4 +1,4 @@
-const { USER_WORKFLOW_TRIGGER_TYPE } = require("../constants/userWorkflow");
+const { USER_WORKFLOW_TRIGGER_TYPE } = require("@constants/userWorkflow");
 
 const toggleUserWorkflowTrigger = async (req, res) => {
   try {

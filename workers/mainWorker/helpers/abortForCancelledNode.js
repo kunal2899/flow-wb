@@ -1,4 +1,4 @@
-const { WORKFLOW_NODE_EXECUTION_STATUS } = require("../../../constants/workflowExecution");
+const { WORKFLOW_NODE_EXECUTION_STATUS } = require("@constants/workflowExecution");
 
 const abortForCancelledNode = async (nodeExecution) => {
   await nodeExecution.reload();

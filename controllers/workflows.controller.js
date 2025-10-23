@@ -1,6 +1,6 @@
-const generateIdentifier = require("../utils/generateIdentifier");
-const sequelize = require("../configs/dbConfig");
-const { NODE_TYPE } = require("../constants/node");
+const generateIdentifier = require("@utils/generateIdentifier");
+const sequelize = require("@configs/dbConfig");
+const { NODE_TYPE } = require("@constants/node");
 const { get, pick, omit } = require("lodash");
 
 /**

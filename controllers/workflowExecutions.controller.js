@@ -1,8 +1,8 @@
 const { Op } = require("sequelize");
-const sequelize = require("../configs/dbConfig");
-const { WORKFLOW_EXECUTION_STATUS, WORKFLOW_NODE_EXECUTION_STATUS } = require("../constants/workflowExecution");
+const sequelize = require("@configs/dbConfig");
+const { WORKFLOW_EXECUTION_STATUS, WORKFLOW_NODE_EXECUTION_STATUS } = require("@constants/workflowExecution");
 const { pick } = require("lodash");
-const workflowQueue = require("../services/queueServices/workflowQueue.service");
+const workflowQueue = require("@services/queueServices/workflowQueue.service");
 
 const getExecutionsHistory = async (req, res) => {
   try {

@@ -1,6 +1,6 @@
 const { DataTypes } = require("sequelize");
-const sequelize = require("../configs/dbConfig");
-const { WORKFLOW_EXECUTION_STATUS } = require("../constants/workflowExecution");
+const sequelize = require("@configs/dbConfig");
+const { WORKFLOW_EXECUTION_STATUS } = require("@constants/workflowExecution");
 
 const WorkflowExecution = sequelize.define(
   "workflowExecution",

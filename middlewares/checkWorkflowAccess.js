@@ -1,6 +1,4 @@
-const { USER_WORKFLOW_ROLE } = require("../constants/userWorkflow");
-const UserWorkflow = require("../models/UserWorkflow.model");
-const Workflow = require("../models/Workflow.model");
+const { USER_WORKFLOW_ROLE } = require("@constants/userWorkflow");
 
 const checkWorkflowAccess = async (req, res, next) => {
   try {

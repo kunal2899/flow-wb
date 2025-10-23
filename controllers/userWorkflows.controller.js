@@ -1,5 +1,5 @@
-const { USER_WORKFLOW_TRIGGER_TYPE } = require("../constants/userWorkflow");
-const executeWorkflow = require("../helpers/executeWorkflow");
+const { USER_WORKFLOW_TRIGGER_TYPE } = require("@constants/userWorkflow");
+const executeWorkflow = require("@helpers/executeWorkflow");
 
 /**
  * @swagger

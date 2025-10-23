@@ -1,4 +1,5 @@
 const express = require('express');
+require('module-alias/register');
 const swaggerUi = require('swagger-ui-express');
 const swaggerSpecs = require('./configs/swagger');
 const { connectToServices } = require('./services/coreServices/dbConnectionService');

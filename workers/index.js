@@ -1,8 +1,8 @@
 const mainWorker = require("./mainWorker");
-const globalModelsLoader = require("../helpers/globalModelsLoader");
+const globalModelsLoader = require("@helpers/globalModelsLoader");
 const {
   connectToServices,
-} = require("../services/coreServices/dbConnectionService");
+} = require("@services/coreServices/dbConnectionService");
 
 const initialiseWorkers = async () => {
   try {

@@ -1,6 +1,6 @@
 const { flatten } = require("lodash");
-const sequelize = require("../../configs/dbConfig");
-const models = require("../../models");
+const sequelize = require("@configs/dbConfig");
+const models = require("@models");
 require("dotenv").config({ quiet: true });
 
 const syncModels = async (options = {}) => {

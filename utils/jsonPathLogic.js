@@ -1,6 +1,5 @@
-const jsonLogic = require("json-logic-js");
 const { JSONPath } = require("jsonpath-plus");
-const { isString, isObject, has, isNil } = require("lodash");
+const { isString, isObject, isNil } = require("lodash");
 
 /**
  * Checks if a string is a valid JSONPath expression

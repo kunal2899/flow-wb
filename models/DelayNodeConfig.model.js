@@ -1,6 +1,6 @@
 const { DataTypes } = require("sequelize");
-const sequelize = require("../configs/dbConfig");
-const { TIME_UNIT } = require("../constants/common");
+const sequelize = require("@configs/dbConfig");
+const { TIME_UNIT } = require("@constants/common");
 
 const DelayNodeConfig = sequelize.define(
   "delayNodeConfig",

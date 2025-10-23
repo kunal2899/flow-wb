@@ -1,5 +1,5 @@
 const { map, get } = require("lodash");
-const { NODE_TYPE } = require("../../../constants/node");
+const { NODE_TYPE } = require("@constants/node");
 const { Op } = require("sequelize");
 
 const getNextNodes = async ({ workflowNode, nodeExecution }) => {
