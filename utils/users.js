@@ -1,5 +1,3 @@
-const { User } = require("../models");
-
 const getFullName = (user) => `${user.firstName} ${user.lastName}`;
 
 const generateUserIdentifier = (
