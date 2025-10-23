@@ -11,7 +11,6 @@ const validateEntity = require("../../../utils/validateEntity");
 const validateConnection = async (req, res, next) => {
   try {
     const { workflowId } = req.params;
-    console.log({ params: req.params })
     const connection = req.body;
     validateEntity({
       schema: connectionSchema,
