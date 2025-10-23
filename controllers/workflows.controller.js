@@ -1,17 +1,7 @@
-const UserWorkflow = require("../models/UserWorkflow.model");
-const Workflow = require("../models/Workflow.model");
 const generateIdentifier = require("../utils/generateIdentifier");
 const sequelize = require("../configs/dbConfig");
 const { NODE_TYPE } = require("../constants/node");
-const { get, pick, omit, map } = require("lodash");
-const Endpoint = require("../models/Endpoint.model");
-const ActionNodeConfig = require("../models/ActionNodeConfig.model");
-const Node = require("../models/Node.model");
-const WorkflowNode = require("../models/WorkflowNode.model");
-const UserEndpoint = require("../models/UserEndpoint.model");
-const DelayNodeConfig = require("../models/DelayNodeConfig.model");
-const Rule = require("../models/Rule.model");
-const WorkflowNodeConnections = require("../models/WorkflowNodeConnections.model");
+const { get, pick, omit } = require("lodash");
 
 /**
  * @swagger
@@ -816,7 +806,7 @@ const getWorkflowGraph = async (req, res) => {
         ],
         transaction,
       });
-      const workflowNodeConnections = await WorkflowNodeConnections.findAll({
+      const workflowNodeConnection = await WorkflowNodeConnection.findAll({
         where: { workflowId, isActive: true },
         attributes: {
           exclude: [
@@ -831,7 +821,7 @@ const getWorkflowGraph = async (req, res) => {
       });
       const workflowGraph = {
         workflowNodes,
-        connections: workflowNodeConnections,
+        connections: workflowNodeConnection,
       };
       return res.status(200).json({
         success: true,

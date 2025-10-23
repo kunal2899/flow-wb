@@ -1,9 +1,3 @@
-const Node = require("../models/Node.model");
-const Rule = require("../models/Rule.model");
-const Workflow = require("../models/Workflow.model");
-const WorkflowNode = require("../models/WorkflowNode.model");
-const WorkflowNodeConnections = require("../models/WorkflowNodeConnections.model");
-
 /**
  * @swagger
  * /nodes/{workflowNodeId}:

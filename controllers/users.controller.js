@@ -1,4 +1,3 @@
-const User = require("../models/User.model");
 const usersService = require("../services/users.service");
 const { generateHash } = require("../utils/bcryptUtils");
 const { generateUniqueUserIdentifier, getFullName } = require("../utils/users");
