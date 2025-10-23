@@ -1,11 +1,11 @@
 const { pick, has } = require("lodash");
-const { NODE_TYPE, ON_ERROR_ACTION } = require("../../../../constants/node");
+const { NODE_TYPE, ON_ERROR_ACTION } = require("@constants/node");
 const {
   WORKFLOW_NODE_EXECUTION_STATUS,
-} = require("../../../../constants/workflowExecution");
+} = require("@constants/workflowExecution");
 const processActionNode = require("./processActionNode");
 const processConditionNode = require("./processConditionNode");
-const abortForCancelledNode = require("../../helpers/abortForCancelledNode");
+const abortForCancelledNode = require("../../../helpers/abortForCancelledNode");
 
 const processNode = async ({ nodeExecution, workflowNode, globalContext }) => {
   const updateData = {};
@@ -27,7 +27,11 @@ const processNode = async ({ nodeExecution, workflowNode, globalContext }) => {
 
     switch (currentNode.type) {
       case NODE_TYPE.ACTION:
-        const output = await processActionNode(nodeExecution, workflowNode, globalContext);
+        const output = await processActionNode(
+          nodeExecution,
+          workflowNode,
+          globalContext
+        );
         if (output.success) {
           updateData.output = output.data;
           globalContext.nodes[`wn_${workflowNodeId}`] = output;
