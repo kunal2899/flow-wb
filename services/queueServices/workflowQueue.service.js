@@ -1,5 +1,5 @@
-const { MAIN_QUEUE_NAME } = require("../../constants/common");
-const BaseQueue = require("../../entities/baseQueue");
+const { MAIN_QUEUE_NAME } = require("@constants/common");
+const BaseQueue = require("@entities/baseQueue");
 
 class WorkflowQueue {
   constructor() {
@@ -7,12 +7,14 @@ class WorkflowQueue {
     this.workflowQueue.queueName = MAIN_QUEUE_NAME;
   }
 
-  enqueueWorkflowJob = (payload, options = {}) =>
-    this.workflowQueue.addJob(
-      'workflow',
-      payload,
-      options
-    );
+  enqueueWorkflowJob = ({ jobName = "workflow", payload, options = {} }) =>
+    this.workflowQueue.addJob(jobName, payload, options);
+
+  scheduleWorkflowJob = ({ jobName = "workflow-cron", jobId, payload, options = {} }) => 
+    this.workflowQueue.addJobScheduler(jobId, { name: jobName, data: payload }, options);
+
+  removeScheduledJob = (jobId) =>
+    this.workflowQueue.removeJobScheduler(jobId);
 
   getWorkflowJob = (jobId) => this.workflowQueue.getJob(jobId);
 

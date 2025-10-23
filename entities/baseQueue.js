@@ -1,5 +1,5 @@
 const { Queue } = require("bullmq");
-const { getRedisConnection } = require("../configs/redisConfig");
+const { getRedisConnection } = require("@configs/redisConfig");
 
 class BaseQueue {
   constructor(queueName) {
@@ -38,6 +38,18 @@ class BaseQueue {
 
   removeJob(jobId) {
     return this.queue.remove(jobId);
+  }
+
+  addJobScheduler(jobSchedulerId, jobData, options = {}) {
+    return this.queue.upsertJobScheduler(
+      jobSchedulerId,
+      { tz: "Asia/Kolkata", ...options },
+      jobData,
+    );
+  }
+
+  removeJobScheduler(jobSchedulerId) {
+    return this.queue.removeJobScheduler(jobSchedulerId);
   }
 
   _getQueueInstance() {
