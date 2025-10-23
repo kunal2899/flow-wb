@@ -1,6 +1,5 @@
-const sequelize = require("../configs/dbConfig");
-const { WORKFLOW_EXECUTION_STATUS } = require("../constants/workflowExecution");
-const workflowQueue = require("../services/queueServices/workflowQueue.service");
+const { USER_WORKFLOW_TRIGGER_TYPE } = require("@constants/userWorkflow");
+const executeWorkflow = require("@helpers/executeWorkflow");
 
 /**
  * @swagger
@@ -136,33 +135,60 @@ const startUserWorkflow = async (req, res) => {
   try {
     const { userWorkflowId } = req.params;
     const { triggerId = null, triggerPayload = {} } = req.body || {};
-    await sequelize.transaction(async transaction => {
-      const workflowExecution = await WorkflowExecution.create(
-        {
-          userWorkflowId,
-          status: WORKFLOW_EXECUTION_STATUS.QUEUED,
-          triggerId,
-          triggerPayload,
-        },
-        { transaction }
-      );
-      await workflowQueue.enqueueWorkflowJob(
-        {
-          workflowExecutionId: workflowExecution.id,
-          userWorkflowId,
-        },
-        { jobId: `wf-${workflowExecution.id}` }
-      );
-    });
-    return res.status(200).json({ success: true, message: "Workflow execution started" });
+    await executeWorkflow({ userWorkflowId, triggerId, triggerPayload });
+    return res
+      .status(200)
+      .json({ success: true, message: "Workflow execution started" });
   } catch (error) {
-    console.error("Error in userWorkflowsController.startUserWorkflow - ", error);
-    return res.status(400).json({ success: false, message: "Something went wrong!" });
+    console.error(
+      "Error in userWorkflowsController.startUserWorkflow - ",
+      error
+    );
+    return res
+      .status(400)
+      .json({ success: false, message: "Something went wrong!" });
   }
-}
+};
+
+const addUserWorkflowTrigger = async (req, res) => {
+  try {
+    const { userWorkflowId } = req.params;
+    const { type } = req.body;
+    switch (type) {
+      case USER_WORKFLOW_TRIGGER_TYPE.CRON:
+        await UserWorkflowTrigger.addCronTrigger(userWorkflowId, req.body);
+        break;
+      case USER_WORKFLOW_TRIGGER_TYPE.SCHEDULE:
+        await UserWorkflowTrigger.addScheduleTrigger(userWorkflowId, req.body);
+        break;
+      case USER_WORKFLOW_TRIGGER_TYPE.WEBHOOK:
+        break;
+      default:
+        throw new Error("Unsupported trigger type");
+    }
+    return res
+      .status(200)
+      .json({ success: true, message: "Trigger added successfully" });
+  } catch (error) {
+    console.error(
+      "Error in userWorkflowsController.addUserWorkflowTrigger - ",
+      error
+    );
+    if (error.message === "Validation error") {
+      return res.status(409).json({
+        success: false,
+        message: "This type of trigger with similar config already exists",
+      });
+    }
+    return res
+      .status(400)
+      .json({ success: false, message: "Something went wrong!" });
+  }
+};
 
 module.exports = {
   getAllUserWorkflows,
   getUserWorkflow,
   startUserWorkflow,
-}
+  addUserWorkflowTrigger,
+};

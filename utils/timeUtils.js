@@ -1,4 +1,4 @@
-const { TIME_UNIT } = require("../constants/common");
+const { TIME_UNIT } = require("@constants/common");
 
 const convertTimeToMs = (duration, unit) => {
   switch (unit) {

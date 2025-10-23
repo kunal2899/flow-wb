@@ -1,5 +1,3 @@
-const UserWorkflow = require("../models/UserWorkflow.model");
-
 const checkUserWorkflowAccess = async (req, res, next) => {
   try {
     const { userWorkflowId } = req.params;

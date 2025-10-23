@@ -1,9 +1,9 @@
 const {
   WORKFLOW_EXECUTION_STATUS,
   WORKFLOW_NODE_EXECUTION_STATUS,
-} = require("../../../constants/workflowExecution");
-const { isNull, has, some, set, pick } = require("lodash");
-const validateJobPayload = require("../validators/validateJobPayload");
+} = require("@constants/workflowExecution");
+const { isNull, has, some, set } = require("lodash");
+const validateJobPayload = require("../../validators/validateJobPayload");
 const processNodesWithQueue = require("./coreProcessors/processNodesWithQueue");
 const { Op } = require("sequelize");
 
@@ -21,12 +21,15 @@ const processWorkflow = async (job) => {
 
     validateJobPayload(job.data);
 
-    const workflowExecution = await WorkflowExecution.findByPk(workflowExecutionId, {
-      include: [UserWorkflow],
-    });
+    const workflowExecution = await WorkflowExecution.findByPk(
+      workflowExecutionId,
+      {
+        include: [UserWorkflow],
+      }
+    );
 
     if (!workflowExecution) throw new Error("Invalid workflow execution");
-    
+
     if (
       [
         WORKFLOW_EXECUTION_STATUS.RUNNING,
@@ -46,7 +49,7 @@ const processWorkflow = async (job) => {
     if (isNull(workflowExecution.startedAt)) {
       workflowExecution.startedAt = new Date();
     }
-    
+
     await workflowExecution.save();
 
     const { workflowId } = workflowExecution.userWorkflow;

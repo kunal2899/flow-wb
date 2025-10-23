@@ -1,5 +1,5 @@
 const Joi = require("joi");
-const { pickFields } = require("../utils/joiUtils");
+const { pickFields } = require("@utils/joiUtils");
 
 const validationRules = {
   sourceNodeId: Joi.number(),

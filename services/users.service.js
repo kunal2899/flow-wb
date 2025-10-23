@@ -1,8 +1,7 @@
 const jwt = require("jsonwebtoken");
 const { pick } = require("lodash");
-const { validateHash } = require("../utils/bcryptUtils");
-const { getFullName } = require("../utils/users");
-const User = require("../models/User.model");
+const { validateHash } = require("@utils/bcryptUtils");
+const { getFullName } = require("@utils/users");
 require("dotenv").config({ quiet: true });
 
 const authenticateUser = async ({ type, data }) => {

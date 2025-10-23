@@ -1,10 +1,14 @@
-const { replaceJsonPathVars } = require("../../../../utils/jsonPathLogic");
-const redisCacheService = require("../../../../services/coreServices/redisCache.service");
+const { replaceJsonPathVars } = require("@utils/jsonPathLogic");
+const redisCacheService = require("@services/coreServices/redisCache.service");
 const { isNil, pick } = require("lodash");
-const makeApiCall = require("../../helpers/makeApiCall");
-const abortForCancelledNode = require("../../helpers/abortForCancelledNode");
+const makeApiCall = require("../../../helpers/makeApiCall");
+const abortForCancelledNode = require("../../../helpers/abortForCancelledNode");
 
-const processActionNode = async (nodeExecution, workflowNode, globalContext) => {
+const processActionNode = async (
+  nodeExecution,
+  workflowNode,
+  globalContext
+) => {
   try {
     const { id: workflowNodeId } = workflowNode;
     const cacheKey = `nodeConfig:${workflowNodeId}`;

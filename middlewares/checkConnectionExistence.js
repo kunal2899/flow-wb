@@ -1,11 +1,9 @@
-const WorkflowNodeConnections = require("../models/WorkflowNodeConnections.model");
-
 const checkConnectionExistence = async (req, res, next) => {
   try {
     const { connectionId } = req.params;
     if (!connectionId)
       return res.status(400).send({ message: "Connection id is required" });
-    const connection = await WorkflowNodeConnections.findByPk(connectionId);
+    const connection = await WorkflowNodeConnection.findByPk(connectionId);
     if (!connection)
       return res.status(404).send({ message: "Connection not found" });
     req.connection = connection;

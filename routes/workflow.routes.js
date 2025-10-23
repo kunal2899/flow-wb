@@ -1,8 +1,8 @@
 const express = require("express");
-const validateCreateWorkflow = require("../middlewares/validators/workflows/validateCreateWorkflow");
-const validateUpdateWorkflow = require("../middlewares/validators/workflows/validateUpdateWorkflow");
-const validateUpdateWorkflowStatus = require("../middlewares/validators/workflows/validateUpdateWorkflowStatus");
-const validateUpdateWorkflowVisibility = require("../middlewares/validators/workflows/validateUpdateWorkflowVisibility");
+const validateCreateWorkflow = require("@middlewares/validators/workflows/validateCreateWorkflow");
+const validateUpdateWorkflow = require("@middlewares/validators/workflows/validateUpdateWorkflow");
+const validateUpdateWorkflowStatus = require("@middlewares/validators/workflows/validateUpdateWorkflowStatus");
+const validateUpdateWorkflowVisibility = require("@middlewares/validators/workflows/validateUpdateWorkflowVisibility");
 const {
   createWorkflow,
   updateWorkflow,
@@ -12,9 +12,9 @@ const {
   createWorkflowNode,
   getWorkflowNodes,
   getWorkflowGraph,
-} = require("../controllers/workflows.controller");
-const checkWorkflowAccess = require("../middlewares/checkWorkflowAccess");
-const validateCreateWorkflowNode = require("../middlewares/validators/nodes/validateCreateWorkflowNode");
+} = require("@controllers/workflows.controller");
+const checkWorkflowAccess = require("@middlewares/checkWorkflowAccess");
+const validateCreateWorkflowNode = require("@middlewares/validators/nodes/validateCreateWorkflowNode");
 const connectionRoutes = require("./connection.routes");
 
 const router = express.Router();

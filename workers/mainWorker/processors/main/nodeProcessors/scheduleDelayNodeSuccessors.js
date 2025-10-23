@@ -1,10 +1,10 @@
 const { Promise } = require("bluebird");
-const { convertTimeToMs } = require("../../../../utils/timeUtils");
-const workflowQueue = require("../../../../services/queueServices/workflowQueue.service");
+const { convertTimeToMs } = require("@utils/timeUtils");
+const workflowQueue = require("@services/queueServices/workflowQueue.service");
 const {
   WORKFLOW_NODE_EXECUTION_STATUS,
-} = require("../../../../constants/workflowExecution");
-const abortForCancelledNode = require("../../helpers/abortForCancelledNode");
+} = require("@constants/workflowExecution");
+const abortForCancelledNode = require("../../../helpers/abortForCancelledNode");
 
 const scheduleDelayNodeSuccessors = async ({
   workflowExecutionId,
@@ -32,27 +32,24 @@ const scheduleDelayNodeSuccessors = async ({
           workflowNodeId: nextNode.id,
           status: WORKFLOW_NODE_EXECUTION_STATUS.QUEUED,
         });
-        await workflowQueue.enqueueWorkflowJob(
-          {
+        await workflowQueue.enqueueWorkflowJob({
+          payload: {
             workflowExecutionId,
             userWorkflowId,
             startNodeId: nextNode.id,
             globalContext,
           },
-          {
+          options: {
             jobId: `wf-${workflowExecutionId}-delay-${nextNode.id}`,
             delay: delayInMs,
-          }
-        );
+          },
+        });
       },
       { concurrency: 3 }
     );
     Object.assign(updateData, {
       output: {
-        willResumeAt: new Date(Date.now() + delayInMs + 5.5 * 60 * 60 * 1000)
-          .toISOString()
-          .replace("T", " ")
-          .replace("Z", " IST"),
+        willResumeAt: new Date(),
       },
       status: WORKFLOW_NODE_EXECUTION_STATUS.COMPLETED,
       endedAt: new Date(),

@@ -1,14 +1,14 @@
 const { Promise } = require("bluebird");
-const { NODE_TYPE } = require("../../../../constants/node");
-const getNextNodes = require("../../helpers/getNextNodes");
-const getStartNode = require("../../helpers/getStartNode");
+const { NODE_TYPE } = require("@constants/node");
+const getNextNodes = require("../../../helpers/getNextNodes");
+const getStartNode = require("../../../helpers/getStartNode");
 const processNode = require("../nodeProcessors/processNode");
 const scheduleDelayNodeSuccessors = require("../nodeProcessors/scheduleDelayNodeSuccessors");
 const {
   WORKFLOW_NODE_EXECUTION_STATUS,
   WORKFLOW_EXECUTION_STATUS,
-} = require("../../../../constants/workflowExecution");
-const WorkflowNodeExecution = require("../../../../models/WorkflowNodeExecution.model");
+} = require("@constants/workflowExecution");
+const WorkflowNodeExecution = require("@models/WorkflowNodeExecution.model");
 
 const processNodesWithQueue = async ({
   startNodeId,

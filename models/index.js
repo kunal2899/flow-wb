@@ -1,5 +1,4 @@
 const fs = require("fs");
-const { startCase } = require("lodash");
 const path = require("path");
 
 const models = {};

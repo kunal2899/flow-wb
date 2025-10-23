@@ -1,7 +1,7 @@
 const express = require('express');
-const checkWorkflowNodeExistence = require('../middlewares/checkWorkflowNodeExistence');
-const { getNode, updateNode, deleteNode } = require('../controllers/nodes.controller');
-const validateUpdateWorkflowNode = require('../middlewares/validators/nodes/validateUpdateWorkflowNode');
+const checkWorkflowNodeExistence = require('@middlewares/checkWorkflowNodeExistence');
+const { getNode, updateNode, deleteNode } = require('@controllers/nodes.controller');
+const validateUpdateWorkflowNode = require('@middlewares/validators/nodes/validateUpdateWorkflowNode');
 
 const router = express.Router();
 

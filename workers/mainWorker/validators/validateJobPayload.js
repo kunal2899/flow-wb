@@ -1,5 +1,5 @@
 const Joi = require("joi");
-const validateEntity = require("../../../utils/validateEntity");
+const validateEntity = require("@utils/validateEntity");
 
 const jobPayloadSchema = Joi.object().keys({
   workflowExecutionId: Joi.number().required(),

@@ -1,5 +1,5 @@
 const { isNil, isString } = require('lodash');
-const { getRedisConnection } = require('../../configs/redisConfig');
+const { getRedisConnection } = require('@configs/redisConfig');
 
 class RedisCacheService {
   constructor() {
