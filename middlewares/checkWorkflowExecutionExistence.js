@@ -1,5 +1,3 @@
-const WorkflowExecution = require("../models/WorkflowExecution.model");
-
 const checkWorkflowExecutionExistence = async (req, res, next) => {
   try {
     const { userWorkflowId, workflowExecutionId } = req.params;

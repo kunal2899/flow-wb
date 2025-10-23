@@ -1,7 +1,3 @@
-const Node = require("../models/Node.model");
-const Workflow = require("../models/Workflow.model");
-const WorkflowNode = require("../models/WorkflowNode.model");
-
 const checkWorkflowNodeExistence = async(req, res, next) => {
   try {
     const { workflowNodeId } = req.params
