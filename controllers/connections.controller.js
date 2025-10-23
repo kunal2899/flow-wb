@@ -1,8 +1,3 @@
-const Node = require("../models/Node.model");
-const Rule = require("../models/Rule.model");
-const WorkflowNode = require("../models/WorkflowNode.model");
-const WorkflowNodeConnections = require("../models/WorkflowNodeConnections.model");
-
 const definedInclusion = {
   include: [
     {
@@ -121,7 +116,7 @@ const createConnection = async (req, res) => {
     const { workflowId } = req.params;
     const connectionData = req.body;
     const connectionObj = { ...connectionData, isActive: true, workflowId };
-    const [connection, isCreated] = await WorkflowNodeConnections.findOrCreate({
+    const [connection, isCreated] = await WorkflowNodeConnection.findOrCreate({
       where: connectionObj,
       defaults: connectionObj,
     });
@@ -231,7 +226,7 @@ const updateConnection = async (req, res) => {
     const { connectionId } = req.params;
     const connectionData = req.body;
     const [affectedRows, [updatedConnection]] =
-      await WorkflowNodeConnections.update(connectionData, {
+      await WorkflowNodeConnection.update(connectionData, {
         where: { id: connectionId, isActive: true },
         returning: true,
       });
@@ -324,7 +319,7 @@ const updateConnection = async (req, res) => {
 const deleteConnection = async (req, res) => {
   try {
     const { connectionId } = req.params;
-    await WorkflowNodeConnections.destroy({
+    await WorkflowNodeConnection.destroy({
       where: { id: connectionId },
     });
     return res.status(200).json({
@@ -430,7 +425,7 @@ const updateConnectionStatus = async (req, res) => {
   try {
     const { connectionId } = req.params;
     const { isActive } = req.body;
-    const [_, [updatedConnection]] = await WorkflowNodeConnections.update(
+    const [_, [updatedConnection]] = await WorkflowNodeConnection.update(
       { isActive },
       {
         where: { id: connectionId },

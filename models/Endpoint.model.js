@@ -1,6 +1,6 @@
 const { DataTypes } = require("sequelize");
-const sequelize = require("../configs/dbConfig");
-const { HTTP_METHOD } = require("../constants/common");
+const sequelize = require("@configs/dbConfig");
+const { HTTP_METHOD } = require("@constants/common");
 
 const Endpoint = sequelize.define(
   "endpoint",

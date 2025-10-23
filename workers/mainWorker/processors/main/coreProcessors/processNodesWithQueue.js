@@ -1,26 +1,27 @@
 const { Promise } = require("bluebird");
-const { NODE_TYPE } = require("../../../../constants/node");
-const getNextNodes = require("../../helpers/getNextNodes");
-const getStartNode = require("../../helpers/getStartNode");
+const { NODE_TYPE } = require("@constants/node");
+const getNextNodes = require("../../../helpers/getNextNodes");
+const getStartNode = require("../../../helpers/getStartNode");
 const processNode = require("../nodeProcessors/processNode");
 const scheduleDelayNodeSuccessors = require("../nodeProcessors/scheduleDelayNodeSuccessors");
 const {
   WORKFLOW_NODE_EXECUTION_STATUS,
-} = require("../../../../constants/workflowExecution");
-// const runtimeStateManager = require("../../states/runtimeStateManager");
-const { Op } = require("sequelize");
-const { findIndex, compact } = require("lodash");
-const runtimeStateManager = require("../../states/runtimeStateManager");
+  WORKFLOW_EXECUTION_STATUS,
+} = require("@constants/workflowExecution");
+const WorkflowNodeExecution = require("@models/WorkflowNodeExecution.model");
+const runtimeStateManager = require("../../../states/runtimeStateManager");
+const runtimeStateManager = require("../../../states/runtimeStateManager");
+const runtimeStateManager = require("../../../states/runtimeStateManager");
 
 const processNodesWithQueue = async ({
   startNodeId,
   workflowId,
   globalContext,
-  workflowExecutionId,
+  workflowExecution,
   userWorkflowId,
-  isResume,
 }) => {
   try {
+    const { id: workflowExecutionId } = workflowExecution;
     let nodeQueue = [];
     if (isResume) {
       const queuedNodeIds = await runtimeStateManager.getQueuedNodeIds(
@@ -92,6 +93,14 @@ const processNodesWithQueue = async ({
             },
           });
 
+          await workflowExecution.reload();
+          
+          if (workflowExecution.status === WORKFLOW_EXECUTION_STATUS.STOPPED) {
+            const error = new Error("Workflow execution has been stopped");
+            error.code = "WF-ABORT";
+            throw error;
+          }
+
           await processNode({
             nodeExecution,
             workflowNode,
@@ -111,7 +120,7 @@ const processNodesWithQueue = async ({
               nextNodes,
               globalContext,
               nodeExecution,
-              // nodeQueue,
+              //nodeQueue,
             });
           } else {
             await Promise.map(nextNodes, async (nextNode) => {

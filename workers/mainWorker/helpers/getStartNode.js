@@ -20,7 +20,10 @@ const getStartNode = async ({ startNodeId, workflowId }) => {
       attributes: { exclude: ["createdAt", "updatedAt", "deletedAt"] },
     };
     if (!isNull(startNodeId)) {
-      return WorkflowNode.scope("plain").findByPk(startNodeId, defaultInclusions);
+      return WorkflowNode.scope("plain").findByPk(
+        startNodeId,
+        defaultInclusions
+      );
     }
     return WorkflowNode.scope("plain").findOne({
       where: {

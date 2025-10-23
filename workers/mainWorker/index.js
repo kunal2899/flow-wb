@@ -1,9 +1,11 @@
+require("module-alias/register");
 const { Worker } = require("bullmq");
-const { MAIN_QUEUE_NAME } = require("../../constants/common");
+const { MAIN_QUEUE_NAME } = require("@constants/common");
 const { has } = require("lodash");
-const processWorkflow = require("./processors/processWorkflow");
-const { getRedisConnection } = require("../../configs/redisConfig");
-// const runtimeStateManager = require("./states/runtimeStateManager");
+const processWorkflow = require("./processors/main/processWorkflow");
+const processScheduleJob = require("./processors/scheduled/processScheduleJob");
+const { getRedisConnection } = require("@configs/redisConfig");
+const { USER_WORKFLOW_TRIGGER_TYPE } = require("@constants/userWorkflow");
 
 const connection = getRedisConnection();
 
@@ -12,8 +14,24 @@ const worker = new Worker(
   async (job) => {
     const timeLabel = `job-${job.id}`;
     console.time(timeLabel);
-    console.timeLog(timeLabel, "Processing workflow: ", job.name);
-    await processWorkflow(job);
+    console.timeLog(timeLabel, "Processing workflow job: ", job.name);
+    switch (job.name) {
+      case "workflow":
+        await processWorkflow(job);
+        break;
+      case "workflow-cron":
+        await processScheduleJob({
+          job,
+          type: USER_WORKFLOW_TRIGGER_TYPE.CRON,
+        });
+        break;
+      case "workflow-schedule":
+        await processScheduleJob({
+          job,
+          type: USER_WORKFLOW_TRIGGER_TYPE.SCHEDULE,
+        });
+        break;
+    }
     console.timeEnd(timeLabel);
   },
   {
@@ -26,11 +44,11 @@ const worker = new Worker(
     concurrency: 5,
     connection,
     settings: {
-      stalledInterval: 30 * 1000, 
+      stalledInterval: 30 * 1000,
       maxStalledCount: 1,
     },
     lockDuration: 60 * 1000,
-    lockRenewTime: 15 * 1000,  
+    lockRenewTime: 15 * 1000,
   }
 );
 

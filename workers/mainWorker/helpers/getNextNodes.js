@@ -1,5 +1,5 @@
 const { map, get } = require("lodash");
-const { NODE_TYPE } = require("../../../constants/node");
+const { NODE_TYPE } = require("@constants/node");
 const { Op } = require("sequelize");
 
 const getNextNodes = async ({ workflowNode, nodeExecution }) => {
@@ -14,9 +14,11 @@ const getNextNodes = async ({ workflowNode, nodeExecution }) => {
     };
     if (nodeType === NODE_TYPE.CONDITION) {
       const matchedRuleIds = get(nodeExecution, "output.matchedRuleIds", []);
-      nextNodesFilter.ruleId = Array.isArray(matchedRuleIds) ? {
-        [Op.in]: get(nodeExecution, "output.matchedRuleIds", []),
-      } : matchedRuleIds ?? null;
+      nextNodesFilter.ruleId = Array.isArray(matchedRuleIds)
+        ? {
+            [Op.in]: get(nodeExecution, "output.matchedRuleIds", []),
+          }
+        : matchedRuleIds ?? null;
     }
     const nextNodesData = await WorkflowNodeConnection.scope("plain").findAll({
       where: nextNodesFilter,

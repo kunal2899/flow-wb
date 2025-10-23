@@ -1,6 +1,6 @@
 const { DataTypes } = require("sequelize");
-const sequelize = require("../configs/dbConfig");
-const { NODE_TYPE } = require("../constants/node");
+const sequelize = require("@configs/dbConfig");
+const { NODE_TYPE } = require("@constants/node");
 
 const Node = sequelize.define(
   "node",

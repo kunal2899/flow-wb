@@ -1,9 +1,14 @@
-const { replaceJsonPathVars } = require("../../../../utils/jsonPathLogic");
-const redisCacheService = require("../../../../services/coreServices/redisCache.service");
+const { replaceJsonPathVars } = require("@utils/jsonPathLogic");
+const redisCacheService = require("@services/coreServices/redisCache.service");
 const { isNil, pick } = require("lodash");
-const makeApiCall = require("../../helpers/makeApiCall");
+const makeApiCall = require("../../../helpers/makeApiCall");
+const abortForCancelledNode = require("../../../helpers/abortForCancelledNode");
 
-const processActionNode = async (workflowNode, globalContext) => {
+const processActionNode = async (
+  nodeExecution,
+  workflowNode,
+  globalContext
+) => {
   try {
     const { id: workflowNodeId } = workflowNode;
     const cacheKey = `nodeConfig:${workflowNodeId}`;
@@ -28,7 +33,7 @@ const processActionNode = async (workflowNode, globalContext) => {
         attributes: ["userEndpointId"],
       });
       if (!actionNodeConfig) throw new Error("Invalid action node config");
-    
+
       userEndpoint = actionNodeConfig.userEndpoint;
       await redisCacheService.set(cacheKey, userEndpoint, 60 * 60 * 24);
     }
@@ -45,7 +50,14 @@ const processActionNode = async (workflowNode, globalContext) => {
     } = userEndpoint;
     const requestHeaders = { ...endpointHeaders, ...headers };
     const requestBody = { ...endpointBody, ...body };
-    const request = { url, method, headers: requestHeaders, body: requestBody, authConfig };
+    const request = {
+      url,
+      method,
+      headers: requestHeaders,
+      body: requestBody,
+      authConfig,
+    };
+    await abortForCancelledNode(nodeExecution);
     const outputData = await makeApiCall(request);
     return pick(outputData, ["success", "data", "error"]);
   } catch (error) {

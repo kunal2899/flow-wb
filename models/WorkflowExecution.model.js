@@ -1,6 +1,6 @@
 const { DataTypes } = require("sequelize");
-const sequelize = require("../configs/dbConfig");
-const { WORKFLOW_EXECUTION_STATUS } = require("../constants/workflowExecution");
+const sequelize = require("@configs/dbConfig");
+const { WORKFLOW_EXECUTION_STATUS } = require("@constants/workflowExecution");
 
 const WorkflowExecution = sequelize.define(
   "workflowExecution",
@@ -32,10 +32,6 @@ const WorkflowExecution = sequelize.define(
     retryOf: {
       type: DataTypes.INTEGER,
     },
-    currentNodeId: {
-      type: DataTypes.INTEGER,
-      comment: "Currently processing node ID for resume capability"
-    },
   },
   { tableName: "workflow_executions" }
 );
@@ -46,6 +42,9 @@ WorkflowExecution.associate = function (models) {
   });
   WorkflowExecution.belongsTo(models.userWorkflow, {
     foreignKey: "userWorkflowId",
+  });
+  WorkflowExecution.hasMany(models.workflowNodeExecution, {
+    foreignKey: "workflowExecutionId",
   });
 };
 

@@ -1,6 +1,6 @@
-const sequelize = require('../../configs/dbConfig');
+const sequelize = require('@configs/dbConfig');
 const redisCacheService = require('./redisCache.service');
-const { closeRedisConnection } = require('../../configs/redisConfig');
+const { closeRedisConnection } = require('@configs/redisConfig');
 
 const connectToDatabase = async () => {
   try {

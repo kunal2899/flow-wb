@@ -1,6 +1,6 @@
 const Joi = require("joi");
-const { HTTP_METHOD, URL_PATTERN } = require("../constants/common");
-const { pickFields } = require("../utils/joiUtils");
+const { HTTP_METHOD, URL_PATTERN } = require("@constants/common");
+const { pickFields } = require("@utils/joiUtils");
 
 const validationRules = {
   name: Joi.string(),

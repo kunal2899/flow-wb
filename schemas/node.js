@@ -1,7 +1,7 @@
 const Joi = require("joi");
-const { NODE_TYPE } = require("../constants/node");
-const { BACKOFF_STRATEGY, HTTP_METHOD, TIME_UNIT } = require("../constants/common");
-const { pickFields } = require("../utils/joiUtils");
+const { NODE_TYPE } = require("@constants/node");
+const { BACKOFF_STRATEGY, TIME_UNIT } = require("@constants/common");
+const { pickFields } = require("@utils/joiUtils");
 const { endpointSchema } = require("./endpoint");
 
 const retryConfigSchema = Joi.object().keys({

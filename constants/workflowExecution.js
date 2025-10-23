@@ -5,15 +5,16 @@ const COMMON_EXECUTION_STATUS = {
   COMPLETED: "completed",
   PAUSED: "paused",
   FAILED: "failed",
-  STOPPED: "stopped",
 };
 
 const WORKFLOW_EXECUTION_STATUS = {
   ...COMMON_EXECUTION_STATUS,
+  STOPPED: "stopped",
 };
 
 const WORKFLOW_NODE_EXECUTION_STATUS = {
   ...COMMON_EXECUTION_STATUS,
+  CANCELLED: "cancelled",
 };
 
 module.exports = {

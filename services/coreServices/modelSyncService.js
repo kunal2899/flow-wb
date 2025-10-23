@@ -1,6 +1,6 @@
 const { flatten } = require("lodash");
-const sequelize = require("../../configs/dbConfig");
-const models = require("../../models");
+const sequelize = require("@configs/dbConfig");
+const models = require("@models");
 require("dotenv").config({ quiet: true });
 
 const syncModels = async (options = {}) => {
@@ -13,28 +13,28 @@ const syncModels = async (options = {}) => {
     // Sync order
     const syncLevels = [
       [
-        // 'user',
-        // 'workflow', 
-        // 'endpoint',
-        // 'node'
+        'user',
+        'workflow', 
+        'endpoint',
+        'node'
       ],
       [
-        // 'userWorkflow',    // depends on User, Workflow
-        // 'userEndpoint',    // depends on User, Endpoint
-        // 'workflowNode'     // depends on Workflow, Node
+        'userWorkflow',    // depends on User, Workflow
+        'userEndpoint',    // depends on User, Endpoint
+        'workflowNode'     // depends on Workflow, Node
       ],
       [
-        // 'userWorkflowTrigger',  // depends on UserWorkflow
-        // 'actionNodeConfig',      // depends on WorkflowNode, UserEndpoint
-        // 'delayNodeConfig',       // depends on WorkflowNode
-        // 'rule'                   // depends on WorkflowNode
+        'userWorkflowTrigger',  // depends on UserWorkflow
+        'actionNodeConfig',      // depends on WorkflowNode, UserEndpoint
+        'delayNodeConfig',       // depends on WorkflowNode
+        'rule'                   // depends on WorkflowNode
       ],
       [
         'workflowExecution',     // depends on UserWorkflowTriggers, UserWorkflow
-        // 'workflowNodeConnection' // depends on WorkflowNode, ConditionNodeConfig
+        'workflowNodeConnection' // depends on WorkflowNode, ConditionNodeConfig
       ],
       [
-        // 'workflowNodeExecution'  // depends on WorkflowExecution, WorkflowNode
+        'workflowNodeExecution'  // depends on WorkflowExecution, WorkflowNode
       ],
     ];
     
@@ -53,9 +53,9 @@ const syncModels = async (options = {}) => {
       }
     }
 
-    // if (flatten(syncLevels).length === 0) {
-    //   sequelize.sync();
-    // }
+    if (flatten(syncLevels).length === 0) {
+      sequelize.sync();
+    }
     
     console.log('All models synced successfully in dependency order!');
   } catch (error) {

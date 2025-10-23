@@ -1,5 +1,5 @@
 const { DataTypes } = require("sequelize");
-const sequelize = require("../configs/dbConfig");
+const sequelize = require("@configs/dbConfig");
 
 const WorkflowNodeConnection = sequelize.define(
   "workflowNodeConnection",

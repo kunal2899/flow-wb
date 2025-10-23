@@ -1,46 +1,46 @@
-const { default: axios } = require("axios");
+const axios = require("axios");
 
 const makeApiCall = async (request, options = {}) => {
-  const { 
-    url, 
-    method, 
-    headers = {}, 
-    body, 
+  const {
+    url,
+    method,
+    headers = {},
+    body,
     authConfig,
-    ...otherConfig 
+    ...otherConfig
   } = request;
 
   let axiosConfig = {
     url,
     method: method.toLowerCase(),
     headers: { ...headers },
-    // timeout: options.timeout || 30000,
-    ...otherConfig
+    timeout: options.timeout || 30000,
+    ...otherConfig,
   };
 
   // Handle authentication
   if (authConfig) {
     switch (authConfig.type) {
-      case 'bearer':
+      case "bearer":
         axiosConfig.headers.Authorization = `Bearer ${authConfig.token}`;
         break;
-      case 'basic':
+      case "basic":
         axiosConfig.auth = {
           username: authConfig.username,
-          password: authConfig.password
+          password: authConfig.password,
         };
         break;
-      case 'apikey':
+      case "apikey":
         axiosConfig.headers[authConfig.keyName] = authConfig.keyValue;
         break;
     }
   }
 
   // Handle request body based on method
-  const methodsWithBody = ['post', 'put', 'patch'];
+  const methodsWithBody = ["post", "put", "patch"];
   if (methodsWithBody.includes(method.toLowerCase()) && body) {
     axiosConfig.data = body;
-  } else if (method.toLowerCase() === 'get' && body) {
+  } else if (method.toLowerCase() === "get" && body) {
     axiosConfig.params = body;
   }
 

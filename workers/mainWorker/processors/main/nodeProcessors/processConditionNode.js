@@ -1,5 +1,5 @@
-const { evaluateLogicWithJsonPath } = require("../../../../utils/jsonPathLogic");
-const redisCacheService = require("../../../../services/coreServices/redisCache.service");
+const { evaluateLogicWithJsonPath } = require("@utils/jsonPathLogic");
+const redisCacheService = require("@services/coreServices/redisCache.service");
 const { isNil } = require("lodash");
 
 const processConditionNode = async (workflowNode, globalContext) => {
