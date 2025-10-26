@@ -19,7 +19,7 @@
   },
   "scripts": {
     "start": "forever app.js --prod",
-    "workers": "node workers/index.js",
+    "workers": "forever workers/index.js",
     "workers:local": "NODE_ENV=local nodemon --watch workers/ workers/index.js",
     "local": "NODE_ENV=local nodemon --ignore workers/ app.js",
     "test": "echo \"Error: no test specified\" && exit 1",
