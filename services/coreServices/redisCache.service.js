@@ -1,5 +1,6 @@
 const { isNil, isString } = require('lodash');
 const { getRedisConnection } = require('@configs/redisConfig');
+const { Promise } = require('bluebird');
 
 class RedisCacheService {
   constructor() {
@@ -45,9 +46,9 @@ class RedisCacheService {
     try {
       const client = this.getClient();
       const value = await client.get(key);
-      
+
       if (isNil(value)) return null;
-      
+
       if (parseJson) {
         try {
           return JSON.parse(value);
@@ -56,7 +57,7 @@ class RedisCacheService {
           return value;
         }
       }
-      
+
       return value;
     } catch (error) {
       console.error(`Error getting key ${key}:`, error);
@@ -89,7 +90,7 @@ class RedisCacheService {
       const client = this.getClient();
       return await client.del(...keys);
     } catch (error) {
-      console.error(`Error deleting keys ${keys.join(', ')}:`, error);
+      console.error(`Error deleting keys ${keys.join(", ")}:`, error);
       return 0;
     }
   }
@@ -166,7 +167,7 @@ class RedisCacheService {
       const client = this.getClient();
       return await client.flushdb();
     } catch (error) {
-      console.error('Error flushing database:', error);
+      console.error("Error flushing database:", error);
       return null;
     }
   }
@@ -220,15 +221,15 @@ class RedisCacheService {
     try {
       const client = this.getClient();
       const args = [];
-      
+
       for (const [key, value] of Object.entries(keyValuePairs)) {
         args.push(key);
         args.push(isString(value) ? value : JSON.stringify(value));
       }
-      
+
       return await client.mset(...args);
     } catch (error) {
-      console.error('Error setting multiple keys:', error);
+      console.error("Error setting multiple keys:", error);
       return null;
     }
   }
@@ -243,9 +244,9 @@ class RedisCacheService {
     try {
       const client = this.getClient();
       const values = await client.mget(...keys);
-      
+
       if (parseJson) {
-        return values.map(value => {
+        return values.map((value) => {
           if (isNil(value)) return null;
           try {
             return JSON.parse(value);
@@ -254,10 +255,10 @@ class RedisCacheService {
           }
         });
       }
-      
+
       return values;
     } catch (error) {
-      console.error(`Error getting multiple keys ${keys.join(', ')}:`, error);
+      console.error(`Error getting multiple keys ${keys.join(", ")}:`, error);
       return [];
     }
   }
@@ -267,7 +268,7 @@ class RedisCacheService {
    * @returns {boolean} - True if connected, false otherwise
    */
   isClientConnected() {
-    return this.client && this.client.status === 'ready';
+    return this.client && this.client.status === "ready";
   }
 
   /**
@@ -279,15 +280,46 @@ class RedisCacheService {
       const client = this.getClient();
       return await client.ping();
     } catch (error) {
-      console.error('Error pinging Redis server:', error);
-      return 'PONG';
+      console.error("Error pinging Redis server:", error);
+      return "PONG";
     }
   }
-  
+
+  async getKeysByPrefix(prefix) {
+    try {
+      const client = this.getClient();
+      const stream = client.scanStream({ match: `${prefix}*` });
+      const keys = [];
+      await new Promise((resolve, reject) => {
+        stream.on("data", (batch) => {
+          batch.forEach((key) => keys.push(key));
+        });
+        stream.on("end", async () => {
+          resolve();
+        });
+        stream.on("error", reject);
+      });
+      return keys;
+    } catch (error) {
+      console.error("Error in getting keys by prefix:", error);
+      return [];
+    }
+  }
+
+  async deleteKeysByPrefix(prefix) {
+    try {
+      const keysToDelete = await this.getKeysByPrefix(prefix);
+      await this.deleteMany(keysToDelete);
+    } catch (error) {
+      console.error("Error in deleting keys by prefix:", error);
+      return false;
+    }
+  }
+
   // List operations
 
-  async pushToList(key, value, direction = 'right') {
-    const method = direction === 'left' ? 'lpush' : 'rpush';
+  async pushToList(key, value, direction = "right") {
+    const method = direction === "left" ? "lpush" : "rpush";
     try {
       const client = this.getClient();
       const stringValue = isString(value) ? value : JSON.stringify(value);
@@ -298,8 +330,8 @@ class RedisCacheService {
     }
   }
 
-  async popFromList(key, direction = 'right') {
-    const method = direction === 'left' ? 'lpop' : 'rpop';
+  async popFromList(key, direction = "right") {
+    const method = direction === "left" ? "lpop" : "rpop";
     try {
       const client = this.getClient();
       const result = await client[method](key);
@@ -359,7 +391,9 @@ class RedisCacheService {
   async addToSet(key, ...values) {
     try {
       const client = this.getClient();
-      const stringValues = values.map(v => (isString(v) ? v : JSON.stringify(v)));
+      const stringValues = values.map((v) =>
+        isString(v) ? v : JSON.stringify(v)
+      );
       return await client.sadd(key, ...stringValues);
     } catch (error) {
       console.error(`Error adding to set ${key}:`, error);
@@ -370,7 +404,9 @@ class RedisCacheService {
   async removeFromSet(key, ...values) {
     try {
       const client = this.getClient();
-      const stringValues = values.map(v => (isString(v) ? v : JSON.stringify(v)));
+      const stringValues = values.map((v) =>
+        isString(v) ? v : JSON.stringify(v)
+      );
       return await client.srem(key, ...stringValues);
     } catch (error) {
       console.error(`Error removing from set ${key}:`, error);
@@ -423,7 +459,7 @@ class RedisCacheService {
     }
   }
 
-  safeParse (value) {
+  safeParse(value) {
     if (!value) return value;
     try {
       return JSON.parse(value);
