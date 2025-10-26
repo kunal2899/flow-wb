@@ -20,10 +20,7 @@ const executeWorkflow = async ({
         { transaction }
       );
       await workflowQueue.enqueueWorkflowJob({
-        payload: {
-          workflowExecutionId: workflowExecution.id,
-          userWorkflowId,
-        },
+        payload: { workflowExecutionId: workflowExecution.id },
         options: { jobId: `wf-exec-${workflowExecution.id}` },
       });
     });

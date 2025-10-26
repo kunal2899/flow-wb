@@ -3,16 +3,12 @@ const validateEntity = require("@utils/validateEntity");
 
 const jobPayloadSchema = Joi.object().keys({
   workflowExecutionId: Joi.number().required(),
-  userWorkflowId: Joi.number().required(),
   startNodeId: Joi.number().allow(null),
   globalContext: Joi.object({
     nodes: Joi.object(),
     workflow: Joi.object(),
-  }).when('startNodeId', {
-    is: Joi.exist().not(null),
-    then: Joi.required(),
-    otherwise: Joi.optional(),
-  }),
+  }).optional(),
+  isResume: Joi.boolean().optional().default(false),
 });
 
 const validateJobPayload = payload => {
