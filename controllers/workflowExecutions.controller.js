@@ -3,6 +3,7 @@ const sequelize = require("@configs/dbConfig");
 const { WORKFLOW_EXECUTION_STATUS, WORKFLOW_NODE_EXECUTION_STATUS } = require("@constants/workflowExecution");
 const { pick } = require("lodash");
 const workflowQueue = require("@services/queueServices/workflowQueue.service");
+const runtimeStateManager = require("@workers/mainWorker/states/runtimeStateManager");
 
 const getExecutionsHistory = async (req, res) => {
   try {
@@ -115,12 +116,15 @@ const stopWorkflowExecution = async (req, res) => {
           transaction,
         }
       );
-      // Cancelled all delayed jobs related to this workflow execution
-      const delayedJobs = await workflowQueue.getDelayedJobs();
-      const jobsToRemove = delayedJobs.filter((job) =>
-        job.id.startsWith(`wf-${workflowExecutionId}-delay-`)
+      // Cancel all jobs related to this workflow execution
+      const allWorkflowJobs = await workflowQueue.getWorkflowJobs();
+      const jobsToRemove = allWorkflowJobs.filter(
+        (job) =>
+          job.id.startsWith(`wf-${workflowExecutionId}`) ||
+          job.id.startsWith(`wf-exec-${workflowExecutionId}`)
       );
       await Promise.all(jobsToRemove.map((job) => job.remove()));
+      await runtimeStateManager.removeFromPendingExecutions(workflowExecutionId);
       return res
         .status(200)
         .json({ success: true, message: "Workflow execution stopped" });
