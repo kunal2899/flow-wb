@@ -2,6 +2,8 @@ const redisCacheService = require('../../../services/coreServices/redisCache.ser
 const { WORKFLOW_EXECUTION_STATUS } = require('../../../constants/workflowExecution');
 const { WORKFLOW_EXECUTION_KEY_PREFIX, PENDING_EXECUTIONS_KEY, RUNTIME_STATE_TTL } = require('../constants');
 const workflowQueue = require('../../../services/queueServices/workflowQueue.service');
+const { Promise } = require('bluebird');
+const { map } = require('lodash');
 
 class RuntimeStateManager {
   constructor() {}
@@ -24,6 +26,10 @@ class RuntimeStateManager {
 
   getContextKey = (workflowExecutionId) =>
     `${WORKFLOW_EXECUTION_KEY_PREFIX}:${workflowExecutionId}:context`;
+
+  async deleteExecutionRelatedKeys(workflowExecutionId) {
+    await redisCacheService.deleteKeysByPrefix(`wf:exec:${workflowExecutionId}:`);
+  }
 
   async flushQueuedNodes(workflowExecutionId) {
     await redisCacheService.delete(this.getQueuedNodesKey(workflowExecutionId));
@@ -55,7 +61,7 @@ class RuntimeStateManager {
     const context = await redisCacheService.get(
       this.getContextKey(workflowExecutionId)
     );
-    return context || {};
+    return context;
   }
 
   async setExecutionContext(workflowExecutionId, context) {
@@ -70,7 +76,7 @@ class RuntimeStateManager {
     const pendingExecutions = await redisCacheService.getListItems(
       PENDING_EXECUTIONS_KEY
     );
-    return pendingExecutions || [];
+    return map(pendingExecutions, String) || [];
   }
 
   async addToPendingExecutions(workflowExecutionId) {
@@ -92,39 +98,24 @@ class RuntimeStateManager {
 
   async resumePendingExecutions() {
     const pendingExecutions = await this.getPendingExecutions();
+    if (pendingExecutions < 1) return;
     console.info(
-      `Found ${pendingExecutions.length} pending executions to resume.`
+      `Found ${pendingExecutions.length} pending executions to resume: ${pendingExecutions}`
     );
-    for (const workflowExecutionId of pendingExecutions) {
-      try {
-        const stringifiedContext = await this.getExecutionContext(
-          workflowExecutionId
-        );
-        let globalContext = {};
-        if (stringifiedContext) {
-          globalContext = JSON.parse(stringifiedContext);
-        }
-        const queuedNodeIds = this.getQueuedNodeIds(workflowExecutionId);
-        if (queuedNodeIds.length === 0) {
-          console.log(
-            `No nodes in queue for execution ${workflowExecutionId}, skipping resume.`
-          );
-        }
-        for (const nodeId of queuedNodeIds) {
-          await workflowQueue.enqueueWorkflowJob({
-            workflowExecutionId,
-            startNodeId: nodeId,
-            globalContext,
-            isResume: true,
-          });
-        }
-      } catch (error) {
-        console.error(
-          `Error resuming workflow execution: ${workflowExecutionId} - `,
-          error
-        );
-      }
-    }
+    await Promise.map(pendingExecutions, async (pendingExecutionId) => {
+      const [workflowExecutionId, startNodeId] = String(pendingExecutionId).split('::');
+      await workflowQueue.enqueueWorkflowJob({
+        payload: {
+          workflowExecutionId: Number(workflowExecutionId),
+          startNodeId: Number(startNodeId),
+          isResume: true,
+        },
+        options: {
+          jobId: `wf-${pendingExecutionId}-resume-${Date.now()}`,
+          removeOnFail: true,
+        },
+      });
+    });
   }
 
   async getVisitedNodes(workflowExecutionId) {
@@ -136,7 +127,8 @@ class RuntimeStateManager {
   }
 
   async markNodeAsVisited(workflowExecutionId, nodeId) {
-    if (!this.isNodeVisited(workflowExecutionId, nodeId)) {
+    const isNodeVisited = await this.isNodeVisited(workflowExecutionId, nodeId);
+    if (!isNodeVisited) {
       await redisCacheService.addToSet(
         this.getVisitedNodesKey(workflowExecutionId),
         nodeId
