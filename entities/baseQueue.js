@@ -10,7 +10,10 @@ class BaseQueue {
   addJob(jobName, jobData, options = {}) {
     const defaultOptions = {
       removeOnComplete: true,
-      removeOnFail: false,
+      removeOnFail: {
+        age: 7 * 24 * 3600,
+        count: 1000,
+      },
       // attempts: 3,
       // backoff: {
       //   type: "exponential",
