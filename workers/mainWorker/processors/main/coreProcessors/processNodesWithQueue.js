@@ -10,23 +10,45 @@ const {
 } = require("@constants/workflowExecution");
 const WorkflowNodeExecution = require("@models/WorkflowNodeExecution.model");
 const runtimeStateManager = require("../../../states/runtimeStateManager");
-const runtimeStateManager = require("../../../states/runtimeStateManager");
-const runtimeStateManager = require("../../../states/runtimeStateManager");
+const { Op } = require("sequelize");
+const { get } = require("lodash");
+
+const addNodeToQueue = async ({ workflowExecutionId, nodeQueue, node }) => {
+  console.log({ node });
+  if (!node) return;
+  nodeQueue.push(node);
+  await runtimeStateManager.addNodeToQueue(workflowExecutionId, node.id);
+};
+
+const popNodeFromQueue = async ({ workflowExecutionId, nodeQueue, index = 0 }) => {
+  const nodeIdToRemove = get(nodeQueue, `[${index}].id`, null);
+  if (!nodeIdToRemove) return;
+  nodeQueue.splice(index, 1);
+  await runtimeStateManager.removeNodeFromQueue(
+    workflowExecutionId,
+    nodeIdToRemove
+  );
+};
 
 const processNodesWithQueue = async ({
   startNodeId,
   workflowId,
   globalContext,
   workflowExecution,
-  userWorkflowId,
+  isResume,
 }) => {
   try {
     const { id: workflowExecutionId } = workflowExecution;
     let nodeQueue = [];
-    if (isResume) {
-      const queuedNodeIds = await runtimeStateManager.getQueuedNodeIds(
-        workflowExecutionId
-      );
+    const queuedNodeIds = await runtimeStateManager.getQueuedNodeIds(
+      workflowExecutionId
+    );
+    const visitedNodes = await runtimeStateManager.getVisitedNodes(workflowExecutionId);
+    if (
+      isResume &&
+      ((startNodeId && visitedNodes.includes(startNodeId)) ||
+        queuedNodeIds.length > 0)
+    ) {
       const workflowNodes = await WorkflowNode.scope("plain").findAll({
         where: { id: { [Op.in]: queuedNodeIds } },
         include: [
@@ -54,35 +76,22 @@ const processNodesWithQueue = async ({
       if (!startNode) {
         throw new Error("Unable to find a valid start node for the workflow");
       }
-      nodeQueue.push(startNode);
       await runtimeStateManager.flushQueuedNodes(workflowExecutionId);
-      await runtimeStateManager.addNodeToQueue(
-        workflowExecutionId,
-        startNode.id
-      );
+      await addNodeToQueue({ workflowExecutionId, nodeQueue, node: startNode });
     }
 
     while (nodeQueue.length > 0) {
       await Promise.map(
         nodeQueue,
-        async (workflowNode) => {
+        async (workflowNode, index) => {
           if (!workflowNode) return;
           const { id: workflowNodeId, node: { type: nodeType } = {} } =
             workflowNode;
-          if (
-            !workflowNodeId ||
-            await runtimeStateManager.isNodeVisited(
-              workflowExecutionId,
-              workflowNodeId
-            )
-          ) {
-            return;
-          }
-
-          await runtimeStateManager.markNodeAsVisited(
+          const isNodeVisited = await runtimeStateManager.isNodeVisited(
             workflowExecutionId,
             workflowNodeId
           );
+          if (!workflowNodeId || isNodeVisited) return;
 
           const [nodeExecution] = await WorkflowNodeExecution.findOrCreate({
             where: { workflowExecutionId, workflowNodeId },
@@ -102,6 +111,7 @@ const processNodesWithQueue = async ({
           }
 
           await processNode({
+            workflowExecutionId,
             nodeExecution,
             workflowNode,
             globalContext,
@@ -115,31 +125,25 @@ const processNodesWithQueue = async ({
           if (nodeType === NODE_TYPE.DELAY) {
             await scheduleDelayNodeSuccessors({
               workflowExecutionId,
-              userWorkflowId,
               workflowNodeId,
               nextNodes,
               globalContext,
               nodeExecution,
-              //nodeQueue,
             });
           } else {
             await Promise.map(nextNodes, async (nextNode) => {
-              await runtimeStateManager.addNodeToQueue(
+              await addNodeToQueue({
                 workflowExecutionId,
-                nextNode.id
-              );
-              nodeQueue.push(nextNode);
+                nodeQueue,
+                node: nextNode,
+              });
             });
-            // await runtimeStateManager.removeNodeFromQueue(
-            //   workflowExecutionId,
-            //   workflowNodeId
-            // );
-            // nodeQueue = nodeQueue.splice(
-            //   findIndex(nodeQueue, { id: workflowNodeId }),
-            //   1
-            // );
-            // nodeQueue.push(...nextNodes);
           }
+          await runtimeStateManager.markNodeAsVisited(
+            workflowExecutionId,
+            workflowNodeId
+          );
+          await popNodeFromQueue({ workflowExecutionId, nodeQueue, index });
         },
         { concurrency: 3 }
       );
@@ -154,10 +158,6 @@ const processNodesWithQueue = async ({
             workflowNodeId
           );
           if (isNodeVisited) {
-            await runtimeStateManager.removeNodeFromQueue(
-              workflowExecutionId,
-              workflowNodeId
-            );
             return acc;
           }
           acc.push(node);
@@ -166,15 +166,14 @@ const processNodesWithQueue = async ({
         []
       );
       nodeQueue.length = 0;
-      // await runtimeStateManager.flushQueuedNodes(workflowExecutionId);
-      // await Promise.map(remainingNodes, async remainingNode => {
-      //   await runtimeStateManager.addNodeToQueue(
-      //     workflowExecutionId,
-      //     remainingNode.id
-      //   );
-      //   nodeQueue.push(remainingNode);
-      // });
-      nodeQueue.push(...remainingNodes);
+      await runtimeStateManager.flushQueuedNodes(workflowExecutionId);
+      await Promise.map(remainingNodes, async remainingNode => {
+        await runtimeStateManager.addNodeToQueue(
+          workflowExecutionId,
+          remainingNode.id
+        );
+        nodeQueue.push(remainingNode);
+      });
     }
   } catch (error) {
     console.error("Error in coreProcessors.processNodesWithQueue - ", error);
