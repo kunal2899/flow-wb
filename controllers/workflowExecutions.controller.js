@@ -7,6 +7,57 @@ const {
 const { pick } = require("lodash");
 const workflowQueue = require("@services/queueServices/workflowQueue.service");
 
+/**
+ * @swagger
+ * /user-workflows/{userWorkflowId}/executions:
+ *   get:
+ *     summary: Get execution history for a user workflow
+ *     description: Retrieves the execution history of a specific user workflow.
+ *     tags: [Workflow Executions]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: userWorkflowId
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: The user workflow ID
+ *         example: 1
+ *       - in: query
+ *         name: page
+ *         schema:
+ *           type: integer
+ *         description: Page number for pagination
+ *         example: 1
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: integer
+ *         description: Number of records per page
+ *         example: 10
+ *       - in: query
+ *         name: status
+ *         schema:
+ *           type: array
+ *           items:
+ *             type: string
+ *           description: Filter by execution status
+ *           example: [COMPLETED, FAILED]
+ *     responses:
+ *       200:
+ *         description: Successfully retrieved execution history
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/apiSchemas/ExecutionHistoryResponse'
+ *       400:
+ *         description: Bad request
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/apiSchemas/ErrorResponse'
+ */
 const getExecutionsHistory = async (req, res) => {
   try {
     const { userWorkflowId } = req.params;
@@ -45,6 +96,50 @@ const getExecutionsHistory = async (req, res) => {
   }
 };
 
+/**
+ * @swagger
+ * /user-workflows/{userWorkflowId}/executions/{workflowExecutionId}:
+ *   get:
+ *     summary: Get execution log for a workflow execution
+ *     description: Retrieves the execution log of a specific workflow execution.
+ *     tags: [Workflow Executions]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: userWorkflowId
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: The user workflow ID
+ *         example: 1
+ *       - in: path
+ *         name: workflowExecutionId
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: The workflow execution ID
+ *         example: 1
+ *       - in: query
+ *         name: includeNodeLevelLogs
+ *         schema:
+ *           type: boolean
+ *         description: Whether to include node-level logs
+ *         example: true
+ *     responses:
+ *       200:
+ *         description: Successfully retrieved execution log
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/apiSchemas/ExecutionLogResponse'
+ *       400:
+ *         description: Bad request
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/apiSchemas/ErrorResponse'
+ */
 const getExecutionLog = async (req, res) => {
   try {
     const workflowExecution = req.workflowExecution;
@@ -76,6 +171,44 @@ const getExecutionLog = async (req, res) => {
   }
 };
 
+/**
+ * @swagger
+ * /user-workflows/{userWorkflowId}/executions/{workflowExecutionId}/stop:
+ *   post:
+ *     summary: Stop a workflow execution
+ *     description: Stops a running workflow execution.
+ *     tags: [Workflow Executions]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: userWorkflowId
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: The user workflow ID
+ *         example: 1
+ *       - in: path
+ *         name: workflowExecutionId
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: The workflow execution ID
+ *         example: 1
+ *     responses:
+ *       200:
+ *         description: Workflow execution stopped successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/apiSchemas/SuccessResponse'
+ *       400:
+ *         description: Bad request
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/apiSchemas/ErrorResponse'
+ */
 const stopWorkflowExecution = async (req, res) => {
   try {
     const { workflowExecution } = req;
@@ -149,6 +282,44 @@ const stopWorkflowExecution = async (req, res) => {
   }
 };
 
+/**
+ * @swagger
+ * /user-workflows/{userWorkflowId}/executions/{workflowExecutionId}/status:
+ *   get:
+ *     summary: Get status of a workflow execution
+ *     description: Retrieves the current status of a specific workflow execution.
+ *     tags: [Workflow Executions]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: userWorkflowId
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: The user workflow ID
+ *         example: 1
+ *       - in: path
+ *         name: workflowExecutionId
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: The workflow execution ID
+ *         example: 1
+ *     responses:
+ *       200:
+ *         description: Successfully retrieved execution status
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/apiSchemas/ExecutionStatusResponse'
+ *       400:
+ *         description: Bad request
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/apiSchemas/ErrorResponse'
+ */
 const getExecutionStatus = async (req, res) => {
   try {
     const { workflowExecutionId } = req.params;

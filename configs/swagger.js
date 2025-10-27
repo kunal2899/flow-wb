@@ -578,6 +578,172 @@ const options = {
             },
           },
         },
+        UserWorkflowTriggers: {
+          type: "object",
+          properties: {
+            id: {
+              type: "integer",
+              description: "Unique identifier for the user workflow trigger",
+              example: 1,
+            },
+            userWorkflowId: {
+              type: "integer",
+              description: "ID of the user workflow",
+              example: 1,
+            },
+            type: {
+              type: "string",
+              enum: ["CRON", "SCHEDULE", "WEBHOOK"],
+              description: "Type of the trigger",
+              example: "CRON",
+            },
+            config: {
+              type: "object",
+              description: "Configuration for the trigger",
+              example: { frequency: "custom", expression: "0 0 * * *" },
+            },
+            isActive: {
+              type: "boolean",
+              description: "Whether the trigger is active",
+              example: true,
+            },
+            createdAt: {
+              type: "string",
+              format: "date-time",
+              description: "Timestamp when the trigger was created",
+              example: "2025-01-10T10:00:00Z",
+            },
+            updatedAt: {
+              type: "string",
+              format: "date-time",
+              description: "Timestamp when the trigger was last updated",
+              example: "2025-01-10T10:30:00Z",
+            },
+            deletedAt: {
+              type: ["string", "null"],
+              format: "date-time",
+              description:
+                "Timestamp when the trigger was deleted, null if not deleted",
+              example: null,
+            },
+          },
+        },
+        WorkflowExecutions: {
+          type: "object",
+          properties: {
+            id: {
+              type: "integer",
+              description: "Unique identifier for the workflow execution",
+              example: 1,
+            },
+            userWorkflowId: {
+              type: "integer",
+              description: "ID of the user workflow",
+              example: 1,
+            },
+            status: {
+              type: "string",
+              enum: [
+                "QUEUED",
+                "RUNNING",
+                "COMPLETED",
+                "FAILED",
+                "STOPPED",
+                "PENDING",
+                "PAUSED",
+              ],
+              description: "Current status of the workflow execution",
+              example: "RUNNING",
+            },
+            startedAt: {
+              type: "string",
+              format: "date-time",
+              description: "Timestamp when the execution started",
+              example: "2025-01-10T10:00:00Z",
+            },
+            endedAt: {
+              type: ["string", "null"],
+              format: "date-time",
+              description:
+                "Timestamp when the execution ended, null if still running",
+              example: null,
+            },
+            createdAt: {
+              type: "string",
+              format: "date-time",
+              description: "Timestamp when the execution record was created",
+              example: "2025-01-10T10:00:00Z",
+            },
+            updatedAt: {
+              type: "string",
+              format: "date-time",
+              description:
+                "Timestamp when the execution record was last updated",
+              example: "2025-01-10T10:30:00Z",
+            },
+          },
+        },
+        WorkflowNodeExecutions: {
+          type: "object",
+          properties: {
+            id: {
+              type: "integer",
+              description: "Unique identifier for the workflow node execution",
+              example: 1,
+            },
+            workflowExecutionId: {
+              type: "integer",
+              description: "ID of the workflow execution",
+              example: 1,
+            },
+            workflowNodeId: {
+              type: "integer",
+              description: "ID of the workflow node",
+              example: 1,
+            },
+            status: {
+              type: "string",
+              enum: [
+                "QUEUED",
+                "RUNNING",
+                "COMPLETED",
+                "FAILED",
+                "CANCELLED",
+                "PENDING",
+                "PAUSED",
+              ],
+              description: "Current status of the node execution",
+              example: "RUNNING",
+            },
+            startedAt: {
+              type: "string",
+              format: "date-time",
+              description: "Timestamp when the node execution started",
+              example: "2025-01-10T10:00:00Z",
+            },
+            endedAt: {
+              type: ["string", "null"],
+              format: "date-time",
+              description:
+                "Timestamp when the node execution ended, null if still running",
+              example: null,
+            },
+            createdAt: {
+              type: "string",
+              format: "date-time",
+              description:
+                "Timestamp when the node execution record was created",
+              example: "2025-01-10T10:00:00Z",
+            },
+            updatedAt: {
+              type: "string",
+              format: "date-time",
+              description:
+                "Timestamp when the node execution record was last updated",
+              example: "2025-01-10T10:30:00Z",
+            },
+          },
+        },
       },
       apiSchemas: {
         CreateWorkflowRequest: {
@@ -980,8 +1146,156 @@ const options = {
                   },
                   ruleId: {
                     type: "integer",
-                    description: "ID of the condition rule (for condition nodes)",
+                    description:
+                      "ID of the condition rule (for condition nodes)",
                     example: 1,
+                  },
+                },
+              },
+            },
+          },
+        },
+        ExecutionHistoryResponse: {
+          type: "object",
+          properties: {
+            success: {
+              type: "boolean",
+              example: true,
+            },
+            data: {
+              type: "object",
+              properties: {
+                totalExecutionsCount: {
+                  type: "integer",
+                  description: "Total number of workflow executions",
+                  example: 100,
+                },
+                workflowExecutions: {
+                  type: "array",
+                  items: {
+                    $ref: "#/components/schemas/WorkflowExecutions",
+                  },
+                },
+              },
+            },
+          },
+        },
+        ExecutionLogResponse: {
+          type: "object",
+          properties: {
+            success: {
+              type: "boolean",
+              example: true,
+            },
+            data: {
+              type: "object",
+              properties: {
+                workflowExecution: {
+                  $ref: "#/components/schemas/WorkflowExecutions",
+                },
+                workflowNodeExecutions: {
+                  type: "array",
+                  items: {
+                    $ref: "#/components/schemas/WorkflowNodeExecutions",
+                  },
+                },
+              },
+            },
+          },
+        },
+        ExecutionStatusResponse: {
+          type: "object",
+          properties: {
+            success: {
+              type: "boolean",
+              example: true,
+            },
+            data: {
+              type: "object",
+              properties: {
+                workflowExecution: {
+                  type: "object",
+                  properties: {
+                    id: {
+                      type: "integer",
+                      description:
+                        "Unique identifier for the workflow execution",
+                      example: 1,
+                    },
+                    status: {
+                      type: "string",
+                      enum: [
+                        "QUEUED",
+                        "RUNNING",
+                        "COMPLETED",
+                        "FAILED",
+                        "STOPPED",
+                        "PENDING",
+                        "PAUSED",
+                      ],
+                      description: "Current status of the workflow execution",
+                      example: "RUNNING",
+                    },
+                    startedAt: {
+                      type: "string",
+                      format: "date-time",
+                      description: "Timestamp when the execution started",
+                      example: "2025-01-10T10:00:00Z",
+                    },
+                    endedAt: {
+                      type: ["string", "null"],
+                      format: "date-time",
+                      description:
+                        "Timestamp when the execution ended, null if still running",
+                      example: null,
+                    },
+                  },
+                },
+                workflowNodeExecutions: {
+                  type: "array",
+                  items: {
+                    type: "object",
+                    properties: {
+                      id: {
+                        type: "integer",
+                        description:
+                          "Unique identifier for the workflow node execution",
+                        example: 1,
+                      },
+                      workflowNodeId: {
+                        type: "integer",
+                        description: "ID of the workflow node",
+                        example: 1,
+                      },
+                      status: {
+                        type: "string",
+                        enum: [
+                          "QUEUED",
+                          "RUNNING",
+                          "COMPLETED",
+                          "FAILED",
+                          "CANCELLED",
+                          "PENDING",
+                          "PAUSED",
+                        ],
+                        description: "Current status of the node execution",
+                        example: "RUNNING",
+                      },
+                      startedAt: {
+                        type: "string",
+                        format: "date-time",
+                        description:
+                          "Timestamp when the node execution started",
+                        example: "2025-01-10T10:00:00Z",
+                      },
+                      endedAt: {
+                        type: ["string", "null"],
+                        format: "date-time",
+                        description:
+                          "Timestamp when the node execution ended, null if still running",
+                        example: null,
+                      },
+                    },
                   },
                 },
               },
