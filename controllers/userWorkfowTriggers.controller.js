@@ -1,5 +1,36 @@
 const { USER_WORKFLOW_TRIGGER_TYPE } = require("@constants/userWorkflow");
 
+/**
+ * @swagger
+ * /user-workflow-triggers/{triggerId}/toggle:
+ *   post:
+ *     summary: Toggle a user workflow trigger
+ *     description: Enables or disables a specific user workflow trigger.
+ *     tags: [User Workflow Triggers]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: triggerId
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: The trigger ID
+ *         example: 1
+ *     responses:
+ *       200:
+ *         description: Trigger toggled successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/apiSchemas/SuccessResponse'
+ *       400:
+ *         description: Bad request
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/apiSchemas/ErrorResponse'
+ */
 const toggleUserWorkflowTrigger = async (req, res) => {
   try {
     const { userWorkflowTrigger } = req;
@@ -27,6 +58,37 @@ const toggleUserWorkflowTrigger = async (req, res) => {
   }
 };
 
+/**
+ * @swagger
+ * /user-workflow-triggers/{triggerId}:
+ *   delete:
+ *     summary: Delete a user workflow trigger
+ *     description: Deletes a specific user workflow trigger.
+ *     tags: [User Workflow Triggers]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: triggerId
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: The trigger ID
+ *         example: 1
+ *     responses:
+ *       200:
+ *         description: Trigger deleted successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/apiSchemas/SuccessResponse'
+ *       400:
+ *         description: Bad request
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/apiSchemas/ErrorResponse'
+ */
 const deleteUserWorkflowTrigger = async (req, res) => {
   try {
     const { userWorkflowTrigger } = req;
