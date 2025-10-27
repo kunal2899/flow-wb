@@ -1,6 +1,9 @@
 const { Op } = require("sequelize");
 const sequelize = require("@configs/dbConfig");
-const { WORKFLOW_EXECUTION_STATUS, WORKFLOW_NODE_EXECUTION_STATUS } = require("@constants/workflowExecution");
+const {
+  WORKFLOW_EXECUTION_STATUS,
+  WORKFLOW_NODE_EXECUTION_STATUS,
+} = require("@constants/workflowExecution");
 const { pick } = require("lodash");
 const workflowQueue = require("@services/queueServices/workflowQueue.service");
 
@@ -27,15 +30,18 @@ const getExecutionsHistory = async (req, res) => {
         offset,
         attributes: { exclude: ["createdAt", "updatedAt", "deletedAt"] },
       });
-    return res
-      .status(200)
-      .json({
-        success: true,
-        data: { totalExecutionsCount, workflowExecutions },
-      });
+    return res.status(200).json({
+      success: true,
+      data: { totalExecutionsCount, workflowExecutions },
+    });
   } catch (error) {
-    console.error("Error in userWorkflowsController.pauseUserWorkflow - ", error);
-    return res.status(400).json({ success: false, message: "Something went wrong!" });
+    console.error(
+      "Error in userWorkflowsController.pauseUserWorkflow - ",
+      error
+    );
+    return res
+      .status(400)
+      .json({ success: false, message: "Something went wrong!" });
   }
 };
 
@@ -56,7 +62,9 @@ const getExecutionLog = async (req, res) => {
         ],
       });
     }
-    return res.status(200).json({ success: true, data: workflowExecution.toJSON() });
+    return res
+      .status(200)
+      .json({ success: true, data: workflowExecution.toJSON() });
   } catch (error) {
     console.error(
       "Error in workflowExecutionsController.getExecutionLog - ",
@@ -72,7 +80,7 @@ const stopWorkflowExecution = async (req, res) => {
   try {
     const { workflowExecution } = req;
     const { workflowExecutionId } = req.params;
-    await sequelize.transaction(async transaction => {
+    await sequelize.transaction(async (transaction) => {
       if (
         Object.values(
           pick(WORKFLOW_EXECUTION_STATUS, ["COMPLETED", "FAILED", "STOPPED"])
@@ -81,17 +89,20 @@ const stopWorkflowExecution = async (req, res) => {
         return res.status(400).json({
           success: false,
           message: `Cannot stop a workflow execution with status: ${workflowExecution.status}`,
-        })
+        });
       }
       // Mark the workflow execution as STOPPED
-      await WorkflowExecution.update({
-        status: WORKFLOW_EXECUTION_STATUS.STOPPED,
-        endedAt: new Date(),
-        reason: "Stopped manually by user",
-      }, {
-        where: { id: workflowExecutionId },
-        transaction,
-      });
+      await WorkflowExecution.update(
+        {
+          status: WORKFLOW_EXECUTION_STATUS.STOPPED,
+          endedAt: new Date(),
+          reason: "Stopped manually by user",
+        },
+        {
+          where: { id: workflowExecutionId },
+          transaction,
+        }
+      );
       // Cancel all active node executions related to this workflow execution
       await WorkflowNodeExecution.update(
         {
@@ -104,11 +115,13 @@ const stopWorkflowExecution = async (req, res) => {
             workflowExecutionId,
             status: {
               [Op.in]: [
-                ...Object.values(pick(WORKFLOW_NODE_EXECUTION_STATUS, [
-                  "RUNNING",
-                  "QUEUED",
-                  "PENDING",
-                ])),
+                ...Object.values(
+                  pick(WORKFLOW_NODE_EXECUTION_STATUS, [
+                    "RUNNING",
+                    "QUEUED",
+                    "PENDING",
+                  ])
+                ),
               ],
             },
           },
@@ -136,8 +149,46 @@ const stopWorkflowExecution = async (req, res) => {
   }
 };
 
+const getExecutionStatus = async (req, res) => {
+  try {
+    const { workflowExecutionId } = req.params;
+    const workflowExecution = await WorkflowExecution.findByPk(
+      workflowExecutionId,
+      {
+        attributes: ["id", "status", "startedAt", "endedAt"],
+        include: [
+          {
+            model: WorkflowNodeExecution,
+            separate: true,
+            attributes: [
+              "id",
+              "workflowNodeId",
+              "status",
+              "startedAt",
+              "endedAt",
+            ],
+            order: [["startedAt", "ASC"]],
+          },
+        ],
+      }
+    );
+    return res
+      .status(200)
+      .json({ success: true, data: workflowExecution.toJSON() });
+  } catch (error) {
+    console.error(
+      "Error in workflowExecutionsController.getExecutionStatus - ",
+      error
+    );
+    return res
+      .status(400)
+      .json({ success: false, message: "Something went wrong!" });
+  }
+};
+
 module.exports = {
   getExecutionsHistory,
   getExecutionLog,
   stopWorkflowExecution,
+  getExecutionStatus,
 };
