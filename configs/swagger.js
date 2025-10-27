@@ -6,10 +6,10 @@ const options = {
     info: {
       title: "Flow Workflow Builder API",
       version: "1.0.0",
-      description: "API documentation for Flow - Workflow Builder application",
+      description: "Flow - Workflow Builder API Documentation",
       contact: {
         name: "Kunal J.",
-        email: "kunal@example.com",
+        email: "kunaljain649@gmail.com",
       },
     },
     servers: [

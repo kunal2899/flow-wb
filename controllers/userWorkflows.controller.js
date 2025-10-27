@@ -131,6 +131,59 @@ const getUserWorkflow = async (req, res) => {
   }
 };
 
+/**
+ * @swagger
+ * /user-workflows/{userWorkflowId}/start:
+ *   post:
+ *     summary: Start a user-workflow
+ *     description: Starts the execution of a specific user-workflow by its ID.
+ *     tags: [User Workflows]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: userWorkflowId
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: The user-workflow ID
+ *         example: 1
+ *     requestBody:
+ *       required: false
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               triggerId:
+ *                 type: integer
+ *                 description: The ID of the trigger to execute
+ *                 example: 123
+ *               triggerPayload:
+ *                 type: object
+ *                 description: Additional payload for the trigger
+ *                 example: {}
+ *     responses:
+ *       200:
+ *         description: Workflow execution started successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 message:
+ *                   type: string
+ *                   example: Workflow execution started
+ *       400:
+ *         description: Bad request
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/apiSchemas/ErrorResponse'
+ */
 const startUserWorkflow = async (req, res) => {
   try {
     const { userWorkflowId } = req.params;
@@ -150,6 +203,66 @@ const startUserWorkflow = async (req, res) => {
   }
 };
 
+/**
+ * @swagger
+ * /user-workflows/{userWorkflowId}/triggers:
+ *   post:
+ *     summary: Add a trigger to a user-workflow
+ *     description: Adds a trigger to a specific user-workflow by its ID.
+ *     tags: [User Workflows]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: userWorkflowId
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: The user-workflow ID
+ *         example: 1
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               type:
+ *                 type: string
+ *                 description: The type of trigger to add
+ *                 enum: [CRON, SCHEDULE, WEBHOOK]
+ *                 example: CRON
+ *               config:
+ *                 type: object
+ *                 description: Configuration for the trigger
+ *                 example: { cronExpression: "0 0 * * *" }
+ *     responses:
+ *       200:
+ *         description: Trigger added successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 message:
+ *                   type: string
+ *                   example: Trigger added successfully
+ *       400:
+ *         description: Bad request
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/apiSchemas/ErrorResponse'
+ *       409:
+ *         description: Conflict - Trigger already exists
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/apiSchemas/ErrorResponse'
+ */
 const addUserWorkflowTrigger = async (req, res) => {
   try {
     const { userWorkflowId } = req.params;
