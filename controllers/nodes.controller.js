@@ -1,3 +1,6 @@
+const sequelize = require('@configs/dbConfig');
+const { Op } = require('sequelize');
+
 /**
  * @swagger
  * /nodes/{workflowNodeId}:
@@ -198,7 +201,7 @@ const updateNode = async (req, res) => {
  * /nodes/{workflowNodeId}:
  *   delete:
  *     summary: Delete a workflow node
- *     description: Deletes a specific workflow node from its associated workflow. The user must have edit access to the associated workflow.
+ *     description: Deletes a specific workflow node from its associated workflow. The user must have edit access to the associated workflow, and that node shouldn't have any active connections and node must not be the start node.
  *     tags: [Workflow Nodes]
  *     security:
  *       - bearerAuth: []
@@ -259,11 +262,37 @@ const updateNode = async (req, res) => {
 const deleteNode = async (req, res) => {
   try {
     const { workflowNodeId } = req.params;
-    await WorkflowNode.destroy({ where: { id: workflowNodeId } });
-    return res.status(200).json({
-      success: true,
-      data: null,
-      message: "Node deleted successfully",
+    const { workflowNode } = req;
+    await sequelize.transaction(async (transaction) => {
+      const connectionsCount = await WorkflowNodeConnection.count({
+        where: {
+          [Op.or]: [
+            { sourceNodeId: workflowNodeId },
+            { destinationNodeId: workflowNodeId },
+          ],
+        },
+        transaction,
+      });
+      if (connectionsCount > 0) {
+        return res
+          .status(400)
+          .json({
+            success: false,
+            message:
+              "Node has active connections, disconnect them before removal.",
+          });
+      }
+      if (workflowNode.isStart) {
+        return res
+          .status(400)
+          .json({ success: false, message: "Cannot delete start node" });
+      }
+      await workflowNode.destroy({ transaction });
+      return res.status(200).json({
+        success: true,
+        data: null,
+        message: "Node deleted successfully",
+      });
     });
   } catch (error) {
     console.error("Error in nodesController.deleteNode - ", error);
