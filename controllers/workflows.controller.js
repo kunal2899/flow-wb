@@ -17,7 +17,7 @@ const { get, pick, omit } = require("lodash");
  *       content:
  *         application/json:
  *           schema:
- *             $ref: '#/components/schemas/CreateWorkflowRequest'
+ *             $ref: '#/components/apiSchemas/CreateWorkflowRequest'
  *     responses:
  *       201:
  *         description: Workflow created successfully
@@ -36,13 +36,13 @@ const { get, pick, omit } = require("lodash");
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/ErrorResponse'
+ *               $ref: '#/components/apiSchemas/ErrorResponse'
  *       401:
  *         description: Unauthorized - Invalid or missing token
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/ErrorResponse'
+ *               $ref: '#/components/apiSchemas/ErrorResponse'
  */
 const createWorkflow = async (req, res) => {
   try {
@@ -96,7 +96,7 @@ const createWorkflow = async (req, res) => {
  *       content:
  *         application/json:
  *           schema:
- *             $ref: '#/components/schemas/UpdateWorkflowRequest'
+ *             $ref: '#/components/apiSchemas/UpdateWorkflowRequest'
  *     responses:
  *       200:
  *         description: Workflow updated successfully
@@ -118,25 +118,25 @@ const createWorkflow = async (req, res) => {
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/ErrorResponse'
+ *               $ref: '#/components/apiSchemas/ErrorResponse'
  *       401:
  *         description: Unauthorized - Invalid or missing token
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/ErrorResponse'
+ *               $ref: '#/components/apiSchemas/ErrorResponse'
  *       403:
  *         description: Forbidden - User doesn't have edit access to this workflow
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/ErrorResponse'
+ *               $ref: '#/components/apiSchemas/ErrorResponse'
  *       404:
  *         description: Workflow not found
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/ErrorResponse'
+ *               $ref: '#/components/apiSchemas/ErrorResponse'
  */
 const updateWorkflow = async (req, res) => {
   try {
@@ -181,7 +181,7 @@ const updateWorkflow = async (req, res) => {
  *       content:
  *         application/json:
  *           schema:
- *             $ref: '#/components/schemas/UpdateWorkflowStatusRequest'
+ *             $ref: '#/components/apiSchemas/UpdateWorkflowStatusRequest'
  *     responses:
  *       200:
  *         description: Workflow status updated successfully
@@ -203,25 +203,25 @@ const updateWorkflow = async (req, res) => {
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/ErrorResponse'
+ *               $ref: '#/components/apiSchemas/ErrorResponse'
  *       401:
  *         description: Unauthorized - Invalid or missing token
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/ErrorResponse'
+ *               $ref: '#/components/apiSchemas/ErrorResponse'
  *       403:
  *         description: Forbidden - User doesn't have edit access to this workflow
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/ErrorResponse'
+ *               $ref: '#/components/apiSchemas/ErrorResponse'
  *       404:
  *         description: Workflow not found
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/ErrorResponse'
+ *               $ref: '#/components/apiSchemas/ErrorResponse'
  */
 const updateWorkflowStatus = async (req, res) => {
   try {
@@ -269,7 +269,7 @@ const updateWorkflowStatus = async (req, res) => {
  *       content:
  *         application/json:
  *           schema:
- *             $ref: '#/components/schemas/UpdateWorkflowVisibilityRequest'
+ *             $ref: '#/components/apiSchemas/UpdateWorkflowVisibilityRequest'
  *     responses:
  *       200:
  *         description: Workflow visibility updated successfully
@@ -291,25 +291,25 @@ const updateWorkflowStatus = async (req, res) => {
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/ErrorResponse'
+ *               $ref: '#/components/apiSchemas/ErrorResponse'
  *       401:
  *         description: Unauthorized - Invalid or missing token
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/ErrorResponse'
+ *               $ref: '#/components/apiSchemas/ErrorResponse'
  *       403:
  *         description: Forbidden - User doesn't have edit access to this workflow
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/ErrorResponse'
+ *               $ref: '#/components/apiSchemas/ErrorResponse'
  *       404:
  *         description: Workflow not found
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/ErrorResponse'
+ *               $ref: '#/components/apiSchemas/ErrorResponse'
  */
 const updateWorkflowVisibility = async (req, res) => {
   try {
@@ -374,25 +374,25 @@ const updateWorkflowVisibility = async (req, res) => {
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/ErrorResponse'
+ *               $ref: '#/components/apiSchemas/ErrorResponse'
  *       401:
  *         description: Unauthorized - Invalid or missing token
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/ErrorResponse'
+ *               $ref: '#/components/apiSchemas/ErrorResponse'
  *       403:
  *         description: Forbidden - User doesn't have owner access to this workflow
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/ErrorResponse'
+ *               $ref: '#/components/apiSchemas/ErrorResponse'
  *       404:
  *         description: Workflow not found
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/ErrorResponse'
+ *               $ref: '#/components/apiSchemas/ErrorResponse'
  */
 const deleteWorkflow = async (req, res) => {
   try {
@@ -450,25 +450,25 @@ const deleteWorkflow = async (req, res) => {
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/ErrorResponse'
+ *               $ref: '#/components/apiSchemas/ErrorResponse'
  *       401:
  *         description: Unauthorized - Invalid or missing token
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/ErrorResponse'
+ *               $ref: '#/components/apiSchemas/ErrorResponse'
  *       403:
  *         description: Forbidden - User doesn't have access to this workflow
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/ErrorResponse'
+ *               $ref: '#/components/apiSchemas/ErrorResponse'
  *       404:
  *         description: Workflow not found
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/ErrorResponse'
+ *               $ref: '#/components/apiSchemas/ErrorResponse'
  */
 const getWorkflowNodes = async (req, res) => {
   try {
@@ -516,7 +516,7 @@ const getWorkflowNodes = async (req, res) => {
  *       content:
  *         application/json:
  *           schema:
- *             $ref: '#/components/schemas/CreateWorkflowNodeRequest'
+ *             $ref: '#/components/apiSchemas/CreateWorkflowNodeRequest'
  *           examples:
  *             action_node:
  *               summary: Action Node Example
@@ -596,25 +596,25 @@ const getWorkflowNodes = async (req, res) => {
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/ErrorResponse'
+ *               $ref: '#/components/apiSchemas/ErrorResponse'
  *       401:
  *         description: Unauthorized - Invalid or missing token
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/ErrorResponse'
+ *               $ref: '#/components/apiSchemas/ErrorResponse'
  *       403:
  *         description: Forbidden - User doesn't have edit access to this workflow
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/ErrorResponse'
+ *               $ref: '#/components/apiSchemas/ErrorResponse'
  *       404:
  *         description: Workflow not found
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/ErrorResponse'
+ *               $ref: '#/components/apiSchemas/ErrorResponse'
  */
 const createWorkflowNode = async (req, res) => {
   try {
@@ -757,31 +757,31 @@ const createWorkflowNode = async (req, res) => {
  *                   example: true
  *                   description: Indicates if the operation was successful
  *                 data:
- *                   $ref: '#/components/schemas/WorkflowGraph'
+ *                   $ref: '#/components/apiSchemas/WorkflowGraph'
  *       400:
  *         description: Bad request
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/ErrorResponse'
+ *               $ref: '#/components/apiSchemas/ErrorResponse'
  *       401:
  *         description: Unauthorized - Invalid or missing token
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/ErrorResponse'
+ *               $ref: '#/components/apiSchemas/ErrorResponse'
  *       403:
  *         description: Forbidden - User doesn't have access to this workflow
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/ErrorResponse'
+ *               $ref: '#/components/apiSchemas/ErrorResponse'
  *       404:
  *         description: Workflow not found
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/ErrorResponse'
+ *               $ref: '#/components/apiSchemas/ErrorResponse'
  */
 const getWorkflowGraph = async (req, res) => {
   try {

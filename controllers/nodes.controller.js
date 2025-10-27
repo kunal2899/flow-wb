@@ -40,25 +40,25 @@
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/ErrorResponse'
+ *               $ref: '#/components/apiSchemas/ErrorResponse'
  *       401:
  *         description: Unauthorized - Invalid or missing token
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/ErrorResponse'
+ *               $ref: '#/components/apiSchemas/ErrorResponse'
  *       403:
  *         description: Forbidden - User doesn't have access to this workflow node
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/ErrorResponse'
+ *               $ref: '#/components/apiSchemas/ErrorResponse'
  *       404:
  *         description: Workflow node not found
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/ErrorResponse'
+ *               $ref: '#/components/apiSchemas/ErrorResponse'
  */
 const getNode = async (req, res) => {
   try {
@@ -97,7 +97,7 @@ const getNode = async (req, res) => {
  *       content:
  *         application/json:
  *           schema:
- *             $ref: '#/components/schemas/UpdateWorkflowNodeRequest'
+ *             $ref: '#/components/apiSchemas/UpdateWorkflowNodeRequest'
  *           examples:
  *             retry_config_override:
  *               summary: Retry Configuration Override
@@ -144,25 +144,25 @@ const getNode = async (req, res) => {
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/ErrorResponse'
+ *               $ref: '#/components/apiSchemas/ErrorResponse'
  *       401:
  *         description: Unauthorized - Invalid or missing token
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/ErrorResponse'
+ *               $ref: '#/components/apiSchemas/ErrorResponse'
  *       403:
  *         description: Forbidden - User doesn't have edit access to this workflow node
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/ErrorResponse'
+ *               $ref: '#/components/apiSchemas/ErrorResponse'
  *       404:
  *         description: Workflow node not found
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/ErrorResponse'
+ *               $ref: '#/components/apiSchemas/ErrorResponse'
  */
 const updateNode = async (req, res) => {
   try {
@@ -236,25 +236,25 @@ const updateNode = async (req, res) => {
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/ErrorResponse'
+ *               $ref: '#/components/apiSchemas/ErrorResponse'
  *       401:
  *         description: Unauthorized - Invalid or missing token
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/ErrorResponse'
+ *               $ref: '#/components/apiSchemas/ErrorResponse'
  *       403:
  *         description: Forbidden - User doesn't have edit access to this workflow node
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/ErrorResponse'
+ *               $ref: '#/components/apiSchemas/ErrorResponse'
  *       404:
  *         description: Workflow node not found
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/ErrorResponse'
+ *               $ref: '#/components/apiSchemas/ErrorResponse'
  */
 const deleteNode = async (req, res) => {
   try {

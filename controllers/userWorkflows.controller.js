@@ -30,13 +30,13 @@ const executeWorkflow = require("@helpers/executeWorkflow");
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/ErrorResponse'
+ *               $ref: '#/components/apiSchemas/ErrorResponse'
  *       401:
  *         description: Unauthorized - Invalid or missing token
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/ErrorResponse'
+ *               $ref: '#/components/apiSchemas/ErrorResponse'
  */
 const getAllUserWorkflows = async (req, res) => {
   try {
@@ -100,25 +100,25 @@ const getAllUserWorkflows = async (req, res) => {
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/ErrorResponse'
+ *               $ref: '#/components/apiSchemas/ErrorResponse'
  *       401:
  *         description: Unauthorized - Invalid or missing token
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/ErrorResponse'
+ *               $ref: '#/components/apiSchemas/ErrorResponse'
  *       403:
  *         description: Forbidden - User doesn't have access to this workflow
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/ErrorResponse'
+ *               $ref: '#/components/apiSchemas/ErrorResponse'
  *       404:
  *         description: Workflow not found
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/ErrorResponse'
+ *               $ref: '#/components/apiSchemas/ErrorResponse'
  */
 const getUserWorkflow = async (req, res) => {
   try {

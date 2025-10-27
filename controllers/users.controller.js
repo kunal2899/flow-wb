@@ -14,7 +14,7 @@ const { generateUniqueUserIdentifier, getFullName } = require("@utils/users");
  *       content:
  *         application/json:
  *           schema:
- *             $ref: '#/components/schemas/RegisterUserRequest'
+ *             $ref: '#/components/apiSchemas/RegisterUserRequest'
  *           examples:
  *             basic:
  *               summary: Basic Registration
@@ -81,7 +81,7 @@ const { generateUniqueUserIdentifier, getFullName } = require("@utils/users");
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/ErrorResponse'
+ *               $ref: '#/components/apiSchemas/ErrorResponse'
  */
 const registerUser = async (req, res) => {
   try {
@@ -136,7 +136,7 @@ const registerUser = async (req, res) => {
  *       content:
  *         application/json:
  *           schema:
- *             $ref: '#/components/schemas/LoginUserRequest'
+ *             $ref: '#/components/apiSchemas/LoginUserRequest'
  *           examples:
  *             email_login:
  *               summary: Email Login
@@ -151,7 +151,7 @@ const registerUser = async (req, res) => {
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/AuthResponse'
+ *               $ref: '#/components/apiSchemas/AuthResponse'
  *       401:
  *         description: Invalid credentials
  *         content:
@@ -170,7 +170,7 @@ const registerUser = async (req, res) => {
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/ErrorResponse'
+ *               $ref: '#/components/apiSchemas/ErrorResponse'
  */
 const loginUser = async (req, res) => {
   try {

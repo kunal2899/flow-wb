@@ -51,7 +51,7 @@ const definedInclusion = {
  *       content:
  *         application/json:
  *           schema:
- *             $ref: '#/components/schemas/CreateConnectionRequest'
+ *             $ref: '#/components/apiSchemas/CreateConnectionRequest'
  *           examples:
  *             simple_connection:
  *               summary: Simple Connection
@@ -85,19 +85,19 @@ const definedInclusion = {
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/ErrorResponse'
+ *               $ref: '#/components/apiSchemas/ErrorResponse'
  *       401:
  *         description: Unauthorized - Invalid or missing token
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/ErrorResponse'
+ *               $ref: '#/components/apiSchemas/ErrorResponse'
  *       403:
  *         description: Forbidden - User doesn't have access to these workflow nodes
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/ErrorResponse'
+ *               $ref: '#/components/apiSchemas/ErrorResponse'
  *       409:
  *         description: Connection already exists between these nodes
  *         content:
@@ -170,7 +170,7 @@ const createConnection = async (req, res) => {
  *       content:
  *         application/json:
  *           schema:
- *             $ref: '#/components/schemas/UpdateConnectionRequest'
+ *             $ref: '#/components/apiSchemas/UpdateConnectionRequest'
  *           examples:
  *             update_rule:
  *               summary: Update Condition Rule
@@ -201,25 +201,25 @@ const createConnection = async (req, res) => {
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/ErrorResponse'
+ *               $ref: '#/components/apiSchemas/ErrorResponse'
  *       401:
  *         description: Unauthorized - Invalid or missing token
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/ErrorResponse'
+ *               $ref: '#/components/apiSchemas/ErrorResponse'
  *       403:
  *         description: Forbidden - User doesn't have access to these workflow nodes
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/ErrorResponse'
+ *               $ref: '#/components/apiSchemas/ErrorResponse'
  *       404:
  *         description: Connection not found
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/ErrorResponse'
+ *               $ref: '#/components/apiSchemas/ErrorResponse'
  */
 const updateConnection = async (req, res) => {
   try {
@@ -296,25 +296,25 @@ const updateConnection = async (req, res) => {
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/ErrorResponse'
+ *               $ref: '#/components/apiSchemas/ErrorResponse'
  *       401:
  *         description: Unauthorized - Invalid or missing token
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/ErrorResponse'
+ *               $ref: '#/components/apiSchemas/ErrorResponse'
  *       403:
  *         description: Forbidden - User doesn't have access to these workflow nodes
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/ErrorResponse'
+ *               $ref: '#/components/apiSchemas/ErrorResponse'
  *       404:
  *         description: Active connection not found
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/ErrorResponse'
+ *               $ref: '#/components/apiSchemas/ErrorResponse'
  */
 const deleteConnection = async (req, res) => {
   try {
@@ -401,25 +401,25 @@ const deleteConnection = async (req, res) => {
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/ErrorResponse'
+ *               $ref: '#/components/apiSchemas/ErrorResponse'
  *       401:
  *         description: Unauthorized - Invalid or missing token
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/ErrorResponse'
+ *               $ref: '#/components/apiSchemas/ErrorResponse'
  *       403:
  *         description: Forbidden - User doesn't have access to these workflow nodes
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/ErrorResponse'
+ *               $ref: '#/components/apiSchemas/ErrorResponse'
  *       404:
  *         description: Connection not found
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/ErrorResponse'
+ *               $ref: '#/components/apiSchemas/ErrorResponse'
  */
 const updateConnectionStatus = async (req, res) => {
   try {
