@@ -66,11 +66,20 @@ const options = {
               type: "string",
               format: "date-time",
               description: "Timestamp when the workflow was created",
+              example: "2025-01-10T10:00:00Z",
             },
             updatedAt: {
               type: "string",
               format: "date-time",
               description: "Timestamp when the workflow was last updated",
+              example: "2025-01-10T10:30:00Z",
+            },
+            deletedAt: {
+              type: ["string", "null"],
+              format: "date-time",
+              description:
+                "Timestamp when the workflow was deleted, null if not deleted",
+              example: null,
             },
           },
         },
@@ -94,120 +103,27 @@ const options = {
               description: "Role of the user in the workflow",
               example: "owner",
             },
-            workflow: {
-              $ref: "#/components/schemas/Workflow",
+            workflow: { $ref: "#/components/schemas/Workflow" },
+            createdAt: {
+              type: "string",
+              format: "date-time",
+              description: "Timestamp when the user-workflow was created",
+              example: "2025-01-10T10:00:00Z",
+            },
+            updatedAt: {
+              type: "string",
+              format: "date-time",
+              description: "Timestamp when the user-workflow was last updated",
+              example: "2025-01-10T10:30:00Z",
+            },
+            deletedAt: {
+              type: ["string", "null"],
+              format: "date-time",
+              description:
+                "Timestamp when the user-workflow was deleted, null if not deleted",
+              example: null,
             },
           },
-        },
-        CreateWorkflowRequest: {
-          type: "object",
-          required: ["name"],
-          properties: {
-            name: {
-              type: "string",
-              description: "Name of the workflow",
-              example: "Email Marketing Campaign",
-            },
-            description: {
-              type: "string",
-              description: "Description of the workflow",
-              example: "Automated email marketing workflow for new subscribers",
-            },
-            visibility: {
-              type: "string",
-              enum: ["public", "private"],
-              description: "Visibility setting for the workflow",
-              example: "private",
-            },
-          },
-        },
-        UpdateWorkflowRequest: {
-          type: "object",
-          properties: {
-            name: {
-              type: "string",
-              description: "Name of the workflow",
-              example: "Updated Email Marketing Campaign",
-            },
-            description: {
-              type: "string",
-              description: "Description of the workflow",
-              example:
-                "Updated automated email marketing workflow for new subscribers",
-            },
-            visibility: {
-              type: "string",
-              enum: ["public", "private"],
-              description: "Visibility setting for the workflow",
-              example: "public",
-            },
-            status: {
-              type: "string",
-              enum: ["draft", "published", "archived"],
-              description: "Status of the workflow",
-              example: "published",
-            },
-          },
-        },
-        UpdateWorkflowStatusRequest: {
-          type: "object",
-          required: ["status"],
-          properties: {
-            status: {
-              type: "string",
-              enum: ["draft", "published", "archived"],
-              description: "New status for the workflow",
-              example: "published",
-            },
-          },
-        },
-        UpdateWorkflowVisibilityRequest: {
-          type: "object",
-          required: ["visibility"],
-          properties: {
-            visibility: {
-              type: "string",
-              enum: ["public", "private"],
-              description: "New visibility setting for the workflow",
-              example: "public",
-            },
-          },
-        },
-        ErrorResponse: {
-          type: "object",
-          properties: {
-            success: {
-              type: "boolean",
-              description: "Success status",
-              example: false,
-            },
-            message: {
-              type: "string",
-              description: "Error message",
-              example: "Something went wrong!",
-            },
-          },
-        },
-        SuccessResponse: {
-          type: "object",
-          properties: {
-            success: {
-              type: "boolean",
-              description: "Success status",
-              example: true,
-            },
-            data: {
-              type: "object",
-              description: "Response data",
-              example: {},
-            },
-            message: {
-              type: "string",
-              description: "Success message (optional)",
-              example: "Operation completed successfully",
-            },
-          },
-          required: ["success", "data"],
         },
         User: {
           type: "object",
@@ -233,93 +149,24 @@ const options = {
               description: "User's email address",
               example: "john.doe@example.com",
             },
-          },
-        },
-        RegisterUserRequest: {
-          type: "object",
-          required: ["firstName", "email", "password"],
-          properties: {
-            firstName: {
+            createdAt: {
               type: "string",
-              description: "User's first name",
-              example: "John",
+              format: "date-time",
+              description: "Timestamp when the user was created",
+              example: "2025-01-10T10:00:00Z",
             },
-            lastName: {
+            updatedAt: {
               type: "string",
-              description: "User's last name",
-              example: "Doe",
+              format: "date-time",
+              description: "Timestamp when the user was last updated",
+              example: "2025-01-10T10:30:00Z",
             },
-            email: {
-              type: "string",
-              format: "email",
-              description: "User's email address",
-              example: "john.doe@example.com",
-            },
-            password: {
-              type: "string",
-              format: "password",
-              description: "User's password (min 8 chars, must include uppercase, lowercase, number, and special char)",
-              example: "StrongP@ss123",
-            },
-          },
-        },
-        LoginUserRequest: {
-          type: "object",
-          required: ["type", "data"],
-          properties: {
-            type: {
-              type: "string",
-              enum: ["email"],
-              description: "Authentication type",
-              example: "email",
-            },
-            data: {
-              type: "object",
-              required: ["email", "password"],
-              properties: {
-                email: {
-                  type: "string",
-                  format: "email",
-                  description: "User's email address",
-                  example: "john.doe@example.com",
-                },
-                password: {
-                  type: "string",
-                  format: "password",
-                  description: "User's password",
-                  example: "StrongP@ss123",
-                },
-              },
-            },
-          },
-        },
-        AuthResponse: {
-          type: "object",
-          required: ["success", "data"],
-          properties: {
-            success: {
-              type: "boolean",
-              description: "Success status",
-              example: true,
-            },
-            data: {
-              type: "object",
-              properties: {
-                token: {
-                  type: "string",
-                  description: "JWT authentication token",
-                  example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
-                },
-                user: {
-                  $ref: "#/components/schemas/User",
-                },
-              },
-              required: ["token", "user"],
-            },
-            message: {
-              type: "string",
-              description: "Success message (optional)",
-              example: "Login successful",
+            deletedAt: {
+              type: ["string", "null"],
+              format: "date-time",
+              description:
+                "Timestamp when the user was deleted, null if not deleted",
+              example: null,
             },
           },
         },
@@ -358,6 +205,25 @@ const options = {
                 jitter: { type: "boolean", example: true },
               },
             },
+            createdAt: {
+              type: "string",
+              format: "date-time",
+              description: "Timestamp when the node was created",
+              example: "2025-01-10T10:00:00Z",
+            },
+            updatedAt: {
+              type: "string",
+              format: "date-time",
+              description: "Timestamp when the node was last updated",
+              example: "2025-01-10T10:30:00Z",
+            },
+            deletedAt: {
+              type: ["string", "null"],
+              format: "date-time",
+              description:
+                "Timestamp when the node was deleted, null if not deleted",
+              example: null,
+            },
           },
         },
         WorkflowNode: {
@@ -383,8 +249,25 @@ const options = {
               description:
                 "Override configuration for the node in this workflow",
             },
-            node: {
-              $ref: "#/components/schemas/Node",
+            node: { $ref: "#/components/schemas/Node" },
+            createdAt: {
+              type: "string",
+              format: "date-time",
+              description: "Timestamp when the workflow node was created",
+              example: "2025-01-10T10:00:00Z",
+            },
+            updatedAt: {
+              type: "string",
+              format: "date-time",
+              description: "Timestamp when the workflow node was last updated",
+              example: "2025-01-10T10:30:00Z",
+            },
+            deletedAt: {
+              type: ["string", "null"],
+              format: "date-time",
+              description:
+                "Timestamp when the workflow node was deleted, null if not deleted",
+              example: null,
             },
           },
         },
@@ -435,6 +318,25 @@ const options = {
               description: "Provider of the endpoint",
               example: "SendGrid",
             },
+            createdAt: {
+              type: "string",
+              format: "date-time",
+              description: "Timestamp when the endpoint was created",
+              example: "2025-01-10T10:00:00Z",
+            },
+            updatedAt: {
+              type: "string",
+              format: "date-time",
+              description: "Timestamp when the endpoint was last updated",
+              example: "2025-01-10T10:30:00Z",
+            },
+            deletedAt: {
+              type: ["string", "null"],
+              format: "date-time",
+              description:
+                "Timestamp when the endpoint was deleted, null if not deleted",
+              example: null,
+            },
           },
         },
         UserEndpoint: {
@@ -467,8 +369,25 @@ const options = {
               type: "object",
               description: "Authentication configuration for the endpoint",
             },
-            endpoint: {
-              $ref: "#/components/schemas/Endpoint",
+            endpoint: { $ref: "#/components/schemas/Endpoint" },
+            createdAt: {
+              type: "string",
+              format: "date-time",
+              description: "Timestamp when the user endpoint was created",
+              example: "2025-01-10T10:00:00Z",
+            },
+            updatedAt: {
+              type: "string",
+              format: "date-time",
+              description: "Timestamp when the user endpoint was last updated",
+              example: "2025-01-10T10:30:00Z",
+            },
+            deletedAt: {
+              type: ["string", "null"],
+              format: "date-time",
+              description:
+                "Timestamp when the user endpoint was deleted, null if not deleted",
+              example: null,
             },
           },
         },
@@ -494,8 +413,26 @@ const options = {
               type: "object",
               description: "Override configuration for the action node",
             },
-            userEndpoint: {
-              $ref: "#/components/schemas/UserEndpoint",
+            userEndpoint: { $ref: "#/components/schemas/UserEndpoint" },
+            createdAt: {
+              type: "string",
+              format: "date-time",
+              description: "Timestamp when the action node config was created",
+              example: "2025-01-10T10:00:00Z",
+            },
+            updatedAt: {
+              type: "string",
+              format: "date-time",
+              description:
+                "Timestamp when the action node config was last updated",
+              example: "2025-01-10T10:30:00Z",
+            },
+            deletedAt: {
+              type: ["string", "null"],
+              format: "date-time",
+              description:
+                "Timestamp when the action node config was deleted, null if not deleted",
+              example: null,
             },
           },
         },
@@ -515,14 +452,31 @@ const options = {
             expression: {
               type: "object",
               description: "Rule expression",
-              example: {
-                and: [{ "==": [{ var: "user.type" }, "premium"] }],
-              },
+              example: { and: [{ "==": [{ var: "user.type" }, "premium"] }] },
             },
             label: {
               type: "string",
               description: "Label for the rule",
               example: "User is premium",
+            },
+            createdAt: {
+              type: "string",
+              format: "date-time",
+              description: "Timestamp when the rule was created",
+              example: "2025-01-10T10:00:00Z",
+            },
+            updatedAt: {
+              type: "string",
+              format: "date-time",
+              description: "Timestamp when the rule was last updated",
+              example: "2025-01-10T10:30:00Z",
+            },
+            deletedAt: {
+              type: ["string", "null"],
+              format: "date-time",
+              description:
+                "Timestamp when the rule was deleted, null if not deleted",
+              example: null,
             },
           },
         },
@@ -541,12 +495,301 @@ const options = {
             },
             duration: {
               type: "integer",
-              description: "Delay duration in milliseconds",
-              example: 5000,
+              description: "Delay duration value",
+              example: 5,
+            },
+            unit: {
+              type: "string",
+              enum: ["milliseconds", "seconds", "minutes", "hours", "days"],
+              description: "Delay duration unit",
+              example: "minutes",
+            },
+            createdAt: {
+              type: "string",
+              format: "date-time",
+              description: "Timestamp when the delay node config was created",
+              example: "2025-01-10T10:00:00Z",
+            },
+            updatedAt: {
+              type: "string",
+              format: "date-time",
+              description:
+                "Timestamp when the delay node config was last updated",
+              example: "2025-01-10T10:30:00Z",
+            },
+            deletedAt: {
+              type: ["string", "null"],
+              format: "date-time",
+              description:
+                "Timestamp when the delay node config was deleted, null if not deleted",
+              example: null,
+            },
+          },
+        },
+        WorkflowNodeConnection: {
+          type: "object",
+          properties: {
+            id: {
+              type: "integer",
+              description: "Unique identifier for the connection",
+              example: 1,
+            },
+            sourceNodeId: {
+              type: "integer",
+              description: "ID of the source workflow node",
+              example: 1,
+            },
+            destinationNodeId: {
+              type: "integer",
+              description: "ID of the destination workflow node",
+              example: 2,
+            },
+            ruleId: {
+              type: "integer",
+              description: "ID of the condition rule (for condition nodes)",
+              example: 1,
+            },
+            isActive: {
+              type: "boolean",
+              description: "Whether the connection is active",
+              example: true,
+            },
+            sourceNode: { $ref: "#/components/schemas/WorkflowNode" },
+            destinationNode: { $ref: "#/components/schemas/WorkflowNode" },
+            rule: { $ref: "#/components/schemas/Rule" },
+            createdAt: {
+              type: "string",
+              format: "date-time",
+              description: "Timestamp when the connection was created",
+              example: "2025-01-10T10:00:00Z",
+            },
+            updatedAt: {
+              type: "string",
+              format: "date-time",
+              description: "Timestamp when the connection was last updated",
+              example: "2025-01-10T10:30:00Z",
+            },
+            deletedAt: {
+              type: ["string", "null"],
+              format: "date-time",
+              description:
+                "Timestamp when the connection was deleted, null if not deleted",
+              example: null,
+            },
+          },
+        },
+      },
+      apiSchemas: {
+        CreateWorkflowRequest: {
+          title: "CreateWorkflowRequest",
+          type: "object",
+          required: ["name"],
+          properties: {
+            name: {
+              type: "string",
+              description: "Name of the workflow",
+              example: "Email Marketing Campaign",
+            },
+            description: {
+              type: "string",
+              description: "Description of the workflow",
+              example: "Automated email marketing workflow for new subscribers",
+            },
+            visibility: {
+              type: "string",
+              enum: ["public", "private"],
+              description: "Visibility setting for the workflow",
+              example: "private",
+            },
+          },
+        },
+        UpdateWorkflowRequest: {
+          title: "UpdateWorkflowRequest",
+          type: "object",
+          properties: {
+            name: {
+              type: "string",
+              description: "Name of the workflow",
+              example: "Updated Email Marketing Campaign",
+            },
+            description: {
+              type: "string",
+              description: "Description of the workflow",
+              example:
+                "Updated automated email marketing workflow for new subscribers",
+            },
+            visibility: {
+              type: "string",
+              enum: ["public", "private"],
+              description: "Visibility setting for the workflow",
+              example: "public",
+            },
+            status: {
+              type: "string",
+              enum: ["draft", "published", "archived"],
+              description: "Status of the workflow",
+              example: "published",
+            },
+          },
+        },
+        UpdateWorkflowStatusRequest: {
+          title: "UpdateWorkflowStatusRequest",
+          type: "object",
+          required: ["status"],
+          properties: {
+            status: {
+              type: "string",
+              enum: ["draft", "published", "archived"],
+              description: "New status for the workflow",
+              example: "published",
+            },
+          },
+        },
+        UpdateWorkflowVisibilityRequest: {
+          title: "UpdateWorkflowVisibilityRequest",
+          type: "object",
+          required: ["visibility"],
+          properties: {
+            visibility: {
+              type: "string",
+              enum: ["public", "private"],
+              description: "New visibility setting for the workflow",
+              example: "public",
+            },
+          },
+        },
+        ErrorResponse: {
+          title: "ErrorResponse",
+          type: "object",
+          properties: {
+            success: {
+              type: "boolean",
+              description: "Success status",
+              example: false,
+            },
+            message: {
+              type: "string",
+              description: "Error message",
+              example: "Something went wrong!",
+            },
+          },
+        },
+        SuccessResponse: {
+          title: "SuccessResponse",
+          type: "object",
+          properties: {
+            success: {
+              type: "boolean",
+              description: "Success status",
+              example: true,
+            },
+            data: {
+              type: "object",
+              description: "Response data",
+              example: {},
+            },
+            message: {
+              type: "string",
+              description: "Success message (optional)",
+              example: "Operation completed successfully",
+            },
+          },
+          required: ["success", "data"],
+        },
+        RegisterUserRequest: {
+          title: "RegisterUserRequest",
+          type: "object",
+          required: ["firstName", "email", "password"],
+          properties: {
+            firstName: {
+              type: "string",
+              description: "User's first name",
+              example: "John",
+            },
+            lastName: {
+              type: "string",
+              description: "User's last name",
+              example: "Doe",
+            },
+            email: {
+              type: "string",
+              format: "email",
+              description: "User's email address",
+              example: "john.doe@example.com",
+            },
+            password: {
+              type: "string",
+              format: "password",
+              description:
+                "User's password (min 8 chars, must include uppercase, lowercase, number, and special char)",
+              example: "StrongP@ss123",
+            },
+          },
+        },
+        LoginUserRequest: {
+          title: "LoginUserRequest",
+          type: "object",
+          required: ["type", "data"],
+          properties: {
+            type: {
+              type: "string",
+              enum: ["email"],
+              description: "Authentication type",
+              example: "email",
+            },
+            data: {
+              type: "object",
+              required: ["email", "password"],
+              properties: {
+                email: {
+                  type: "string",
+                  format: "email",
+                  description: "User's email address",
+                  example: "john.doe@example.com",
+                },
+                password: {
+                  type: "string",
+                  format: "password",
+                  description: "User's password",
+                  example: "StrongP@ss123",
+                },
+              },
+            },
+          },
+        },
+        AuthResponse: {
+          title: "AuthResponse",
+          type: "object",
+          required: ["success", "data"],
+          properties: {
+            success: {
+              type: "boolean",
+              description: "Success status",
+              example: true,
+            },
+            data: {
+              type: "object",
+              properties: {
+                token: {
+                  type: "string",
+                  description: "JWT authentication token",
+                  example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+                },
+                user: {
+                  $ref: "#/components/schemas/User",
+                },
+              },
+              required: ["token", "user"],
+            },
+            message: {
+              type: "string",
+              description: "Success message (optional)",
+              example: "Login successful",
             },
           },
         },
         CreateWorkflowNodeRequest: {
+          title: "CreateWorkflowNodeRequest",
           type: "object",
           required: ["name", "type"],
           properties: {
@@ -623,6 +866,7 @@ const options = {
           },
         },
         UpdateWorkflowNodeRequest: {
+          title: "UpdateWorkflowNodeRequest",
           type: "object",
           required: ["overrideConfig"],
           properties: {
@@ -650,14 +894,11 @@ const options = {
             },
           },
         },
-        WorkflowNodeConnection: {
+        CreateConnectionRequest: {
+          title: "CreateConnectionRequest",
           type: "object",
+          required: ["sourceNodeId", "destinationNodeId"],
           properties: {
-            id: {
-              type: "integer",
-              description: "Unique identifier for the connection",
-              example: 1,
-            },
             sourceNodeId: {
               type: "integer",
               description: "ID of the source workflow node",
@@ -673,19 +914,21 @@ const options = {
               description: "ID of the condition rule (for condition nodes)",
               example: 1,
             },
+          },
+        },
+        UpdateConnectionRequest: {
+          title: "UpdateConnectionRequest",
+          type: "object",
+          properties: {
+            ruleId: {
+              type: "integer",
+              description: "ID of the condition rule (for condition nodes)",
+              example: 1,
+            },
             isActive: {
               type: "boolean",
               description: "Whether the connection is active",
               example: true,
-            },
-            sourceNode: {
-              $ref: "#/components/schemas/WorkflowNode",
-            },
-            destinationNode: {
-              $ref: "#/components/schemas/WorkflowNode",
-            },
-            rule: {
-              $ref: "#/components/schemas/Rule",
             },
           },
         },
@@ -742,42 +985,6 @@ const options = {
                   },
                 },
               },
-            },
-          },
-        },
-        CreateConnectionRequest: {
-          type: "object",
-          required: ["sourceNodeId", "destinationNodeId"],
-          properties: {
-            sourceNodeId: {
-              type: "integer",
-              description: "ID of the source workflow node",
-              example: 1,
-            },
-            destinationNodeId: {
-              type: "integer",
-              description: "ID of the destination workflow node",
-              example: 2,
-            },
-            ruleId: {
-              type: "integer",
-              description: "ID of the condition rule (for condition nodes)",
-              example: 1,
-            },
-          },
-        },
-        UpdateConnectionRequest: {
-          type: "object",
-          properties: {
-            ruleId: {
-              type: "integer",
-              description: "ID of the condition rule (for condition nodes)",
-              example: 1,
-            },
-            isActive: {
-              type: "boolean",
-              description: "Whether the connection is active",
-              example: true,
             },
           },
         },
