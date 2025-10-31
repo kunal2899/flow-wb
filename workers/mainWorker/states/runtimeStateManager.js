@@ -143,7 +143,8 @@ class RuntimeStateManager {
     );
   }
 
-  // === HEARTBEAT (Redis only for monitoring) ===
+  /** These below helpers are intended to set and maintain safeguard
+   *  limits but are currently not being used in this version **/
   async updateHeartbeat(workflowExecutionId, additionalData = {}) {
     const heartbeatData = {
       timestamp: Date.now(),
@@ -174,7 +175,6 @@ class RuntimeStateManager {
     return timeSinceHeartbeat > stuckThresholdMs;
   }
 
-  // === RUNTIME STATS (Redis only for performance) ===
   async updateStats(workflowExecutionId, stats) {
     const currentStats =
       (await redisCacheService.get(this.getStatsKey(workflowExecutionId))) ||
@@ -201,7 +201,6 @@ class RuntimeStateManager {
     return await this.updateStats(workflowExecutionId, stats);
   }
 
-  // === SAFEGUARD CHECKS (Using Redis stats) ===
   async checkSafeguardLimits(workflowExecutionId, limits = {}) {
     const {
       MAX_ITERATIONS = 1000,
@@ -210,10 +209,8 @@ class RuntimeStateManager {
       MAX_EMPTY_ITERATIONS = 10,
     } = limits;
 
-    // Get runtime stats from Redis
     const stats = await this.getStats(workflowExecutionId);
 
-    // Get workflow execution from DB for start time
     const workflowExecution = await WorkflowExecution.findByPk(
       workflowExecutionId
     );
@@ -224,7 +221,6 @@ class RuntimeStateManager {
     const processingTime =
       Date.now() - new Date(workflowExecution.startedAt).getTime();
 
-    // Check violations
     const violations = [];
 
     if ((stats.iterationCount || 0) > MAX_ITERATIONS) {
@@ -263,38 +259,6 @@ class RuntimeStateManager {
     };
   }
 
-  // === DATABASE OPERATIONS (Reusing existing WorkflowExecution model) ===
-  async updateWorkflowStatus(
-    workflowExecutionId,
-    status,
-    reason = null,
-    currentNodeId = null
-  ) {
-    const updateData = { status };
-
-    if (reason) updateData.reason = reason;
-    if (currentNodeId) updateData.currentNodeId = currentNodeId;
-
-    // Set endedAt for terminal states
-    if (
-      [
-        WORKFLOW_EXECUTION_STATUS.COMPLETED,
-        WORKFLOW_EXECUTION_STATUS.FAILED,
-        WORKFLOW_EXECUTION_STATUS.STOPPED,
-      ].includes(status)
-    ) {
-      updateData.endedAt = new Date();
-    }
-
-    await WorkflowExecution.update(updateData, {
-      where: { id: workflowExecutionId },
-    });
-  }
-
-  async getWorkflowExecution(workflowExecutionId) {
-    return await WorkflowExecution.findByPk(workflowExecutionId);
-  }
-
   async shouldResumeWorkflow(workflowExecutionId) {
     const workflowExecution = await this.getWorkflowExecution(
       workflowExecutionId
@@ -327,7 +291,6 @@ class RuntimeStateManager {
     };
   }
 
-  // === CLEANUP (Redis only) ===
   async cleanupRuntimeState(workflowExecutionId) {
     const keys = [
       this.getVisitedNodesKey(workflowExecutionId),
@@ -339,11 +302,10 @@ class RuntimeStateManager {
     console.log(`Cleaned up runtime state for workflow ${workflowExecutionId}`);
   }
 
-  // === MONITORING HELPERS ===
   async getWorkflowProgress(workflowExecutionId) {
     const [workflowExecution, stats, heartbeat, visitedNodes] =
       await Promise.all([
-        this.getWorkflowExecution(workflowExecutionId),
+        WorkflowExecution.scope("plain").findByPk(workflowExecutionId),
         this.getStats(workflowExecutionId),
         this.getHeartbeat(workflowExecutionId),
         this.getVisitedNodes(workflowExecutionId),
