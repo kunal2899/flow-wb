@@ -51,17 +51,12 @@ In today's interconnected digital landscape, businesses and developers need flex
 
 ### System Design
 ```mermaid
-  A - [User Interface]
-  B - [API Service]
-  C - [Redis, Queue]
-  D - [Worker Service]
-  E - [PostgreSQL Database]
-
-  A --> B
-    B --> E
-    B --> C
-      C --> D
-    D --> E  
+  graph
+  A[User] --> B[API Service]
+  B --> E[PostgreSQL Database]
+  B --> C[Redis, Queue]
+  C --> D[Worker Service]
+  D --> E  
 ```
 
 ### Key Components
