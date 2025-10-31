@@ -1,4 +1,5 @@
 const { flatten } = require("lodash");
+require('module-alias/register');
 const sequelize = require("@configs/dbConfig");
 const models = require("@models");
 require("dotenv").config({ quiet: true });
@@ -56,10 +57,13 @@ const syncModels = async (options = {}) => {
     if (flatten(syncLevels).length === 0) {
       sequelize.sync();
     }
-    
+
     console.log('All models synced successfully in dependency order!');
+
+    process.exit(0);
   } catch (error) {
     console.error('Error syncing tables - ', error);
+    process.exit(1)
   }
 }
 
