@@ -1,6 +1,11 @@
 {
   "local": {
     "dbUrl": "DATABASE_URL",
+    "host": "DB_HOST",
+    "user": "DB_USER",
+    "password": "DB_PASSWORD",
+    "database": "DB_NAME",
+    "port": "DB_PORT",
     "redis": {
       "host": "REDIS_HOST",
       "port": "REDIS_PORT",
@@ -9,6 +14,11 @@
   },
   "production": {
     "dbUrl": "DATABASE_URL",
+    "host": "DB_HOST",
+    "user": "DB_USER",
+    "password": "DB_PASSWORD",
+    "database": "DB_NAME",
+    "port": "DB_PORT",
     "redis": {
       "host": "REDIS_HOST",
       "port": "REDIS_PORT",
@@ -16,6 +26,7 @@
     }
   },
   "development": {
+    "dbUrl": "DATABASE_URL",
     "host": "DB_HOST",
     "user": "DB_USER",
     "password": "DB_PASSWORD",
@@ -28,6 +39,7 @@
     }
   },
   "test": {
+    "dbUrl": "DATABASE_URL",
     "host": "DB_HOST",
     "user": "DB_USER",
     "password": "DB_PASSWORD",
