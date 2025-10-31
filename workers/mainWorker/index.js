@@ -6,6 +6,7 @@ const processWorkflow = require("./processors/main/processWorkflow");
 const processScheduleJob = require("./processors/scheduled/processScheduleJob");
 const { getRedisConnection } = require("@configs/redisConfig");
 const { USER_WORKFLOW_TRIGGER_TYPE } = require("@constants/userWorkflow");
+const runtimeStateManager = require("./states/runtimeStateManager");
 
 const connection = getRedisConnection();
 
@@ -72,10 +73,11 @@ worker.on("error", (error) => {
 
 const init = async () => {
   try {
-    const checkRunStatus = setInterval(() => {
+    const checkRunStatus = setInterval(async () => {
       if (worker.isRunning()) {
         clearInterval(checkRunStatus);
         console.log("Main Worker initialised, listening for jobs");
+        await runtimeStateManager.resumePendingExecutions();
       }
     }, 100);
     await worker.run();

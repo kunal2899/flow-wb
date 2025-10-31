@@ -9,37 +9,89 @@ const {
   WORKFLOW_EXECUTION_STATUS,
 } = require("@constants/workflowExecution");
 const WorkflowNodeExecution = require("@models/WorkflowNodeExecution.model");
+const runtimeStateManager = require("../../../states/runtimeStateManager");
+const { Op } = require("sequelize");
+const { get } = require("lodash");
+
+const addNodeToQueue = async ({ workflowExecutionId, nodeQueue, node }) => {
+  console.log({ node });
+  if (!node) return;
+  nodeQueue.push(node);
+  await runtimeStateManager.addNodeToQueue(workflowExecutionId, node.id);
+};
+
+const popNodeFromQueue = async ({ workflowExecutionId, nodeQueue, index = 0 }) => {
+  const nodeIdToRemove = get(nodeQueue, `[${index}].id`, null);
+  if (!nodeIdToRemove) return;
+  nodeQueue.splice(index, 1);
+  await runtimeStateManager.removeNodeFromQueue(
+    workflowExecutionId,
+    nodeIdToRemove
+  );
+};
 
 const processNodesWithQueue = async ({
   startNodeId,
   workflowId,
   globalContext,
   workflowExecution,
-  userWorkflowId,
+  isResume,
 }) => {
   try {
     const { id: workflowExecutionId } = workflowExecution;
     let nodeQueue = [];
-    const startNode = await getStartNode({
-      startNodeId,
-      workflowId,
-    });
-    if (!startNode) {
-      throw new Error("Unable to find a valid start node for the workflow");
+    const queuedNodeIds = await runtimeStateManager.getQueuedNodeIds(
+      workflowExecutionId
+    );
+    const visitedNodes = await runtimeStateManager.getVisitedNodes(workflowExecutionId);
+    if (
+      isResume &&
+      ((startNodeId && visitedNodes.includes(startNodeId)) ||
+        queuedNodeIds.length > 0)
+    ) {
+      const workflowNodes = await WorkflowNode.scope("plain").findAll({
+        where: { id: { [Op.in]: queuedNodeIds } },
+        include: [
+          {
+            model: Node,
+            attributes: {
+              exclude: [
+                "createdAt",
+                "updatedAt",
+                "deletedAt",
+                "name",
+                "description",
+              ],
+            },
+          },
+        ],
+        attributes: { exclude: ["createdAt", "updatedAt", "deletedAt"] },
+      });
+      nodeQueue.push(...workflowNodes);
+    } else {
+      const startNode = await getStartNode({
+        startNodeId,
+        workflowId,
+      });
+      if (!startNode) {
+        throw new Error("Unable to find a valid start node for the workflow");
+      }
+      await runtimeStateManager.flushQueuedNodes(workflowExecutionId);
+      await addNodeToQueue({ workflowExecutionId, nodeQueue, node: startNode });
     }
-    nodeQueue.push(startNode);
-
-    const visitedNodes = new Set();
 
     while (nodeQueue.length > 0) {
       await Promise.map(
         nodeQueue,
-        async (workflowNode) => {
+        async (workflowNode, index) => {
           if (!workflowNode) return;
           const { id: workflowNodeId, node: { type: nodeType } = {} } =
             workflowNode;
-          if (!workflowNodeId || visitedNodes.has(workflowNodeId)) return;
-          visitedNodes.add(workflowNodeId);
+          const isNodeVisited = await runtimeStateManager.isNodeVisited(
+            workflowExecutionId,
+            workflowNodeId
+          );
+          if (!workflowNodeId || isNodeVisited) return;
 
           const [nodeExecution] = await WorkflowNodeExecution.findOrCreate({
             where: { workflowExecutionId, workflowNodeId },
@@ -59,6 +111,7 @@ const processNodesWithQueue = async ({
           }
 
           await processNode({
+            workflowExecutionId,
             nodeExecution,
             workflowNode,
             globalContext,
@@ -72,24 +125,55 @@ const processNodesWithQueue = async ({
           if (nodeType === NODE_TYPE.DELAY) {
             await scheduleDelayNodeSuccessors({
               workflowExecutionId,
-              userWorkflowId,
               workflowNodeId,
               nextNodes,
               globalContext,
               nodeExecution,
             });
           } else {
-            nodeQueue.push(...nextNodes);
+            await Promise.map(nextNodes, async (nextNode) => {
+              await addNodeToQueue({
+                workflowExecutionId,
+                nodeQueue,
+                node: nextNode,
+              });
+            });
           }
+          await runtimeStateManager.markNodeAsVisited(
+            workflowExecutionId,
+            workflowNodeId
+          );
+          await popNodeFromQueue({ workflowExecutionId, nodeQueue, index });
         },
         { concurrency: 3 }
       );
       // Remove visited nodes, prevent infinite loop due to failed filtering
-      const remainingNodes = nodeQueue.filter(
-        (node) => node && !visitedNodes.has(node.id)
+      let remainingNodes = await Promise.reduce(
+        nodeQueue,
+        async (acc, node) => {
+          if (!node) return acc;
+          const workflowNodeId = node.id;
+          const isNodeVisited = await runtimeStateManager.isNodeVisited(
+            workflowExecutionId,
+            workflowNodeId
+          );
+          if (isNodeVisited) {
+            return acc;
+          }
+          acc.push(node);
+          return acc;
+        },
+        []
       );
       nodeQueue.length = 0;
-      nodeQueue.push(...remainingNodes);
+      await runtimeStateManager.flushQueuedNodes(workflowExecutionId);
+      await Promise.map(remainingNodes, async remainingNode => {
+        await runtimeStateManager.addNodeToQueue(
+          workflowExecutionId,
+          remainingNode.id
+        );
+        nodeQueue.push(remainingNode);
+      });
     }
   } catch (error) {
     console.error("Error in coreProcessors.processNodesWithQueue - ", error);

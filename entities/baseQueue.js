@@ -10,13 +10,17 @@ class BaseQueue {
   addJob(jobName, jobData, options = {}) {
     const defaultOptions = {
       removeOnComplete: true,
-      removeOnFail: false,
-      // attempts: 3,
-      // backoff: {
-      //   type: "exponential",
-      //   delay: 2000,
-      //   jitter: 0.1,
-      // },
+      removeOnFail: {
+        age: 7 * 24 * 3600,
+        count: 1000,
+      },
+      // Workflow level default retry config
+      attempts: 3,
+      backoff: {
+        type: "exponential",
+        delay: 2000,
+        jitter: 0.1,
+      },
     };
     return this.queue.add(jobName, jobData, {
       ...defaultOptions,

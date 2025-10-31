@@ -1,13 +1,19 @@
-const { pick, has } = require("lodash");
+const { pick, has, get } = require("lodash");
 const { NODE_TYPE, ON_ERROR_ACTION } = require("@constants/node");
 const {
   WORKFLOW_NODE_EXECUTION_STATUS,
 } = require("@constants/workflowExecution");
 const processActionNode = require("./processActionNode");
 const processConditionNode = require("./processConditionNode");
+const { updateGlobalContext } = require("../../../helpers/globalContext");
 const abortForCancelledNode = require("../../../helpers/abortForCancelledNode");
 
-const processNode = async ({ nodeExecution, workflowNode, globalContext }) => {
+const processNode = async ({
+  workflowExecutionId,
+  nodeExecution,
+  workflowNode,
+  globalContext,
+}) => {
   const updateData = {};
   try {
     const {
@@ -19,27 +25,48 @@ const processNode = async ({ nodeExecution, workflowNode, globalContext }) => {
 
     await abortForCancelledNode(nodeExecution);
 
+    if (nodeExecution.status === WORKFLOW_NODE_EXECUTION_STATUS.COMPLETED)
+      return;
+
     await nodeExecution.update({
       status: WORKFLOW_NODE_EXECUTION_STATUS.RUNNING,
       startedAt: new Date(),
       input: globalContext.nodes[prevNode],
     });
 
+    let output = get(globalContext, `nodes.wn_${workflowNodeId}`, null);
+    const outputNotExists = !output;
     switch (currentNode.type) {
       case NODE_TYPE.ACTION:
-        const output = await processActionNode(
-          nodeExecution,
-          workflowNode,
-          globalContext
-        );
+        if (outputNotExists) {
+          output = await processActionNode(
+            nodeExecution,
+            workflowNode,
+            globalContext
+          );
+        }
         if (output.success) {
           updateData.output = output.data;
-          globalContext.nodes[`wn_${workflowNodeId}`] = output;
+          if (outputNotExists) {
+            await updateGlobalContext({
+              workflowExecutionId,
+              globalContext,
+              key: `nodes.wn_${workflowNodeId}`,
+              data: output,
+            });
+          }
         } else {
           switch (onErrorAction) {
             case ON_ERROR_ACTION.CONTINUE:
               updateData.output = pick(output, "error");
-              globalContext.nodes[`wn_${workflowNodeId}`] = output;
+              if (outputNotExists) {
+                await updateGlobalContext({
+                  workflowExecutionId,
+                  globalContext,
+                  key: `nodes.wn_${workflowNodeId}`,
+                  data: output,
+                });
+              }
               break;
             case ON_ERROR_ACTION.STOP:
             default:
@@ -56,16 +83,24 @@ const processNode = async ({ nodeExecution, workflowNode, globalContext }) => {
         });
         break;
       case NODE_TYPE.CONDITION:
-        const matchedRuleIds = await processConditionNode(
-          workflowNode,
-          globalContext
-        );
+        if (outputNotExists) {
+          const matchedRuleIds = await processConditionNode(
+            workflowNode,
+            globalContext
+          );
+          output = { matchedRuleIds };
+        }
         Object.assign(updateData, {
-          output: { matchedRuleIds },
+          output,
           status: WORKFLOW_NODE_EXECUTION_STATUS.COMPLETED,
           endedAt: new Date(),
         });
-        globalContext.nodes[`wn_${workflowNodeId}`] = { matchedRuleIds };
+        await updateGlobalContext({
+          workflowExecutionId,
+          globalContext,
+          key: `nodes.wn_${workflowNodeId}`,
+          data: output,
+        });
         break;
     }
   } catch (error) {

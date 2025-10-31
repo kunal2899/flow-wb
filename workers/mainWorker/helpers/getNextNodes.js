@@ -48,7 +48,7 @@ const getNextNodes = async ({ workflowNode, nodeExecution }) => {
     const nextNodes = map(nextNodesData, (nodeData) => ({
       ...nodeData.destinationNode,
       ruleId: nodeData.ruleId,
-      prevNode: workflowNodeId,
+      prevNode: `wn_${workflowNodeId}`,
     }));
     return nextNodes;
   } catch (error) {
