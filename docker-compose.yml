@@ -1,0 +1,87 @@
+version: "3.9"
+
+services:
+
+  postgres:
+    image: postgres:17.4
+    container_name: workflow_postgres
+    restart: always
+    env_file:
+      - .env
+    ports:
+      - "${DB_PORT}:5432"
+    environment:
+      POSTGRES_PORT: ${DB_PORT}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DB_NAME}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7.2
+    container_name: workflow_redis
+    restart: always
+    env_file:
+      - .env
+    ports:
+      - "${REDIS_PORT}:6379"
+    volumes:
+      - redis_data:/data
+
+  api:
+    build: .
+    volumes:
+      - .:/usr/src/app
+    container_name: workflow_api
+    restart: always
+    ports:
+      - "${PORT}:3000"
+    env_file:
+      - .env
+    environment:
+      SERVICE_TYPE: app
+      DB_HOST: postgres
+      REDIS_HOST: redis
+    command: >
+      sh -c "
+      if [ '$${NODE_ENV}' = 'local' ]; then
+        npm run sync && npm run start:local
+      else
+        npm run sync && npm start
+      fi"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_started
+
+  worker:
+    build: .
+    container_name: workflow_worker
+    restart: always
+    env_file:
+      - .env
+    environment:
+      SERVICE_TYPE: worker
+      DB_HOST: postgres
+      REDIS_HOST: redis
+    command: >
+      sh -c "
+      if [ '$${NODE_ENV}' = 'local' ]; then
+        npm run workers:local
+      else
+        npm run workers
+      fi"
+    depends_on:
+      api:
+        condition: service_started
+
+volumes:
+  postgres_data:
+  redis_data:
