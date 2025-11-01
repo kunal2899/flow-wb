@@ -46,6 +46,7 @@
     "bullmq": "^5.60.0",
     "cron-parser": "^5.4.0",
     "express": "^5.1.0",
+    "express-rate-limit": "^8.2.1",
     "joi": "^18.0.1",
     "json-canonicalize": "^2.0.0",
     "json-logic-js": "^2.0.5",

@@ -37,9 +37,13 @@ In today's interconnected digital landscape, businesses and developers need flex
   - Dockerized deployment
   - Scalable architecture
   - Worker and API service separation
+  - Rate limitation of 100 reqs/15 mins per IP applied at API level
 
 ### Future Roadmap
 - Support different types of node and triggers
+- Backend ready for retry config storage, can add retry logic
+- Dedicated queue for nodes execution
+- Workflow Pause/Resume capability
 - Visual BPMN-based workflow builder
 - Enhanced third-party integrations (Slack, Gmail, Notion)
 - Custom node development SDK

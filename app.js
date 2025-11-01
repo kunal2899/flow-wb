@@ -5,6 +5,7 @@ const swaggerSpecs = require('./configs/swagger');
 const { connectToServices } = require('./services/coreServices/dbConnectionService');
 const routes = require('./routes');
 const app = express();
+const rateLimit = require('express-rate-limit');
 require('dotenv').config({ quiet: true });
 
 const { PORT=3000 } = process.env;
@@ -23,8 +24,20 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpecs, {
   customSiteTitle: 'Flow WB API Docs'
 }));
 
+// Create rate limiter middleware
+const rateLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 100,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: {
+    success: false,
+    message: 'Too many requests, please try again later.'
+  },
+});
+
 // Routes
-app.use(API_VERSION_PREFIX, routes);
+app.use(API_VERSION_PREFIX, rateLimiter, routes);
 
 app.listen(PORT, (error) => {
   if (error) {
