@@ -22,6 +22,7 @@ const processNode = async ({
       prevNode = "trigger",
       onErrorAction,
     } = workflowNode;
+    console.log("Processing node", { workflowNodeId });
 
     await abortForCancelledNode(nodeExecution);
 

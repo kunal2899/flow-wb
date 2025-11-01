@@ -8,6 +8,7 @@ const getNextNodes = async ({ workflowNode, nodeExecution }) => {
       id: workflowNodeId,
       node: { type: nodeType },
     } = workflowNode;
+    console.log("Getting next nodes", { workflowNodeId, nodeType });
     const nextNodesFilter = {
       sourceNodeId: workflowNodeId,
       isActive: true,
@@ -50,6 +51,10 @@ const getNextNodes = async ({ workflowNode, nodeExecution }) => {
       ruleId: nodeData.ruleId,
       prevNode: `wn_${workflowNodeId}`,
     }));
+    console.log("Next nodes fetched successfully", {
+      workflowNodeId,
+      nextNodesIds: map(nextNodes, "id"),
+    });
     return nextNodes;
   } catch (error) {
     console.error("Error in helpers.getNextNodes - ", error);

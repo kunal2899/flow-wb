@@ -2,7 +2,7 @@ const {
   WORKFLOW_EXECUTION_STATUS,
   WORKFLOW_NODE_EXECUTION_STATUS,
 } = require("@constants/workflowExecution");
-const { isNull, has, some, set, get } = require("lodash");
+const { isNull, has, some, get, isEmpty } = require("lodash");
 const validateJobPayload = require("../../validators/validateJobPayload");
 const processNodesWithQueue = require("./coreProcessors/processNodesWithQueue");
 const { Op } = require("sequelize");
@@ -19,8 +19,15 @@ const processWorkflow = async (job) => {
       isResume = false,
     } = job.data;
 
+    console.info('Starting workflow processing', { 
+      workflowExecutionId: job.data.workflowExecutionId,
+      startNodeId: job.data.startNodeId,
+      isResume: job.data.isResume
+    });
+
     const executionKey = getExecutionKey(workflowExecutionId, startNodeId);
     await runtimeStateManager.addToPendingExecutions(executionKey);
+    console.info('Added to pending executions', { executionKey });
 
     const globalContext = (await runtimeStateManager.getExecutionContext(
       workflowExecutionId
@@ -28,6 +35,8 @@ const processWorkflow = async (job) => {
       nodes: {},
       workflow: {},
     };
+    if (!isEmpty(get(globalContext, 'nodes', {})))
+      console.info("Retrieved global context", { globalContext });
 
     const workflowExecution = await WorkflowExecution.findByPk(
       workflowExecutionId,
@@ -36,7 +45,9 @@ const processWorkflow = async (job) => {
       }
     );
 
-    if (!workflowExecution) throw new Error("Invalid workflow execution");
+    if (!workflowExecution) {
+      throw new Error("Invalid workflow execution");
+    }
 
     if (
       [
@@ -103,30 +114,47 @@ const processWorkflow = async (job) => {
         some(activeNodes, { status: WORKFLOW_NODE_EXECUTION_STATUS.PAUSED })
       ) {
         updateData.status = WORKFLOW_EXECUTION_STATUS.PAUSED;
+        console.info('Workflow execution paused', { workflowExecutionId });
       } else if (
         some(activeNodes, { status: WORKFLOW_NODE_EXECUTION_STATUS.STOPPED })
       ) {
         updateData.status = WORKFLOW_EXECUTION_STATUS.STOPPED;
+        console.info('Workflow execution stopped', { workflowExecutionId });
       } else {
         updateData.status = WORKFLOW_EXECUTION_STATUS.PENDING;
+        console.info('Workflow execution pending', { workflowExecutionId });
       }
     } else {
       Object.assign(updateData, {
         status: WORKFLOW_EXECUTION_STATUS.COMPLETED,
         endedAt: new Date(),
       });
+      console.info('Workflow execution completed', { 
+        workflowExecutionId,
+        endedAt: updateData.endedAt 
+      });
     }
+
     await workflowExecution.reload();
     if (workflowExecution.status !== WORKFLOW_EXECUTION_STATUS.STOPPED) {
       await workflowExecution.update(updateData);
+      console.info('Updated workflow execution status', { 
+        workflowExecutionId, 
+        newStatus: updateData.status 
+      });
     }
+
     if (workflowExecution.status === WORKFLOW_EXECUTION_STATUS.COMPLETED) {
       await runtimeStateManager.deleteExecutionRelatedKeys(workflowExecutionId);
+      console.info('Deleted execution-related keys', { workflowExecutionId });
     }
   } catch (error) {
-    console.error("Error in processors.processWorkflow - ", error);
+    console.error('Error in processors.processWorkflow - ', error);
+
     await runtimeStateManager.deleteExecutionRelatedKeys(workflowExecutionId);
+    
     if (error.code === "WF-ABORT") throw error;
+    
     await WorkflowExecution.update(
       {
         status: WORKFLOW_EXECUTION_STATUS.FAILED,
@@ -135,6 +163,13 @@ const processWorkflow = async (job) => {
       },
       { where: { id: job.data.workflowExecutionId } }
     );
+    
+    console.error('Workflow execution failed', { 
+      workflowExecutionId: job.data.workflowExecutionId,
+      failedAt: new Date(),
+      reason: has(error, "message") ? error.message : String(error)
+    });
+
     throw error;
   } finally {
     const workflowExecutionId = get(job, "data.workflowExecutionId", null);
@@ -142,6 +177,7 @@ const processWorkflow = async (job) => {
       const startNodeId = get(job, "data.startNodeId", null);
       const executionKey = getExecutionKey(workflowExecutionId, startNodeId);
       await runtimeStateManager.removeFromPendingExecutions(executionKey);
+      console.info('Removed from pending executions', { executionKey });
     }
   }
 };

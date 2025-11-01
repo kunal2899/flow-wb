@@ -6,7 +6,7 @@ const {
 } = require("@constants/workflowExecution");
 const abortForCancelledNode = require("../../../helpers/abortForCancelledNode");
 const { updateGlobalContext } = require("../../../helpers/globalContext");
-const sequelize = require('../../../../../configs/dbConfig');
+const sequelize = require("../../../../../configs/dbConfig");
 const { formatTimeInIST } = require("../../../utils");
 
 const scheduleDelayNodeSuccessors = async ({
@@ -20,7 +20,7 @@ const scheduleDelayNodeSuccessors = async ({
   try {
     if (nodeExecution.status === WORKFLOW_NODE_EXECUTION_STATUS.COMPLETED)
       return;
-
+    console.log("Scheduling delay node successors", { workflowNodeId });
     const delayNodeConfig = await DelayNodeConfig.findOne({
       where: { workflowNodeId },
       attributes: { include: ["duration", "unit"] },
@@ -33,7 +33,7 @@ const scheduleDelayNodeSuccessors = async ({
       nextNodes,
       async (nextNode, index) => {
         await abortForCancelledNode(nodeExecution);
-        await sequelize.transaction(async transaction => {
+        await sequelize.transaction(async (transaction) => {
           const [_, isCreated] = await WorkflowNodeExecution.findOrCreate({
             where: {
               workflowExecutionId,
@@ -46,6 +46,9 @@ const scheduleDelayNodeSuccessors = async ({
             },
             transaction,
           });
+          console.log("Successor node execution queued", {
+            nextNode: nextNode.id,
+          });
           if (!isCreated) return;
           await workflowQueue.enqueueWorkflowJob({
             payload: { workflowExecutionId, startNodeId: nextNode.id },
@@ -53,6 +56,10 @@ const scheduleDelayNodeSuccessors = async ({
               jobId: `wf-${workflowExecutionId}-delay-${nextNode.id}`,
               delay: delayInMs,
             },
+          });
+          console.log("Delay job enqueued", {
+            workflowExecutionId,
+            resumeNodeId: nextNode.id,
           });
         });
         await updateGlobalContext({
@@ -64,10 +71,15 @@ const scheduleDelayNodeSuccessors = async ({
       },
       { concurrency: 3 }
     );
+    const willResumeAt = formatTimeInIST({ addMs: delayInMs });
     Object.assign(updateData, {
-      output: { willResumeAt: formatTimeInIST({ addMs: delayInMs }) },
+      output: { willResumeAt },
       status: WORKFLOW_NODE_EXECUTION_STATUS.COMPLETED,
       endedAt: new Date(),
+    });
+    console.log("Delay node successors scheduled", {
+      workflowNodeId,
+      willResumeAt,
     });
   } catch (error) {
     console.error(

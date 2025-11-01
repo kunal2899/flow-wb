@@ -5,6 +5,7 @@ const { isNil } = require("lodash");
 const processConditionNode = async (workflowNode, globalContext) => {
   try {
     const { id: workflowNodeId } = workflowNode;
+    console.log("Processing condition node", { workflowNodeId });
     const cacheKey = `nodeConfig:${workflowNodeId}`;
     let eligibleRuleIds = await redisCacheService.get(cacheKey);
     if (isNil(eligibleRuleIds)) {
@@ -33,6 +34,8 @@ const processConditionNode = async (workflowNode, globalContext) => {
     }
     // If no eligible rules, return null to select the default node
     if (eligibleRuleIds.length === 0) return null;
+    console.log("Eligible rule IDs", { eligibleRuleIds });
+    console.log("Condition node processed successfully", { workflowNodeId });
     return eligibleRuleIds;
   } catch (error) {
     console.error("Error in nodeProcessors.processConditionNode - ", error);

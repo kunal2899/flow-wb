@@ -11,6 +11,7 @@ const processActionNode = async (
 ) => {
   try {
     const { id: workflowNodeId } = workflowNode;
+    console.log("Processing action node", { workflowNodeId });
     const cacheKey = `nodeConfig:${workflowNodeId}`;
     let userEndpoint = await redisCacheService.get(cacheKey);
     if (isNil(userEndpoint)) {
@@ -58,7 +59,10 @@ const processActionNode = async (
       authConfig,
     };
     await abortForCancelledNode(nodeExecution);
+    console.log("Making API call", { method, url });
     const outputData = await makeApiCall(request);
+    console.log("API call completed", { success: outputData.success });
+    console.log("Action node processed successfully", { workflowNodeId });
     return pick(outputData, ["success", "data", "error"]);
   } catch (error) {
     console.error("Error in nodeProcessors.processActionNode - ", error);

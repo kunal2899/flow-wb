@@ -11,10 +11,9 @@ const {
 const WorkflowNodeExecution = require("@models/WorkflowNodeExecution.model");
 const runtimeStateManager = require("../../../states/runtimeStateManager");
 const { Op } = require("sequelize");
-const { get } = require("lodash");
+const { get, map } = require("lodash");
 
 const addNodeToQueue = async ({ workflowExecutionId, nodeQueue, node }) => {
-  console.log({ node });
   if (!node) return;
   nodeQueue.push(node);
   await runtimeStateManager.addNodeToQueue(workflowExecutionId, node.id);
@@ -39,6 +38,11 @@ const processNodesWithQueue = async ({
 }) => {
   try {
     const { id: workflowExecutionId } = workflowExecution;
+    console.log("Started processing workflow nodes", {
+      workflowExecutionId,
+      startNodeId,
+      isResume,
+    });
     let nodeQueue = [];
     const queuedNodeIds = await runtimeStateManager.getQueuedNodeIds(
       workflowExecutionId
@@ -49,6 +53,7 @@ const processNodesWithQueue = async ({
       ((startNodeId && visitedNodes.includes(startNodeId)) ||
         queuedNodeIds.length > 0)
     ) {
+      console.log("Processing queued nodes", { queuedNodeIds });
       const workflowNodes = await WorkflowNode.scope("plain").findAll({
         where: { id: { [Op.in]: queuedNodeIds } },
         include: [
@@ -76,8 +81,10 @@ const processNodesWithQueue = async ({
       if (!startNode) {
         throw new Error("Unable to find a valid start node for the workflow");
       }
+      console.log(`Found start node`, { startNode: startNode.id });
       await runtimeStateManager.flushQueuedNodes(workflowExecutionId);
       await addNodeToQueue({ workflowExecutionId, nodeQueue, node: startNode });
+      console.log("Added start node to queue");
     }
 
     while (nodeQueue.length > 0) {
@@ -87,12 +94,15 @@ const processNodesWithQueue = async ({
           if (!workflowNode) return;
           const { id: workflowNodeId, node: { type: nodeType } = {} } =
             workflowNode;
+          console.info("Picking node from queue", { workflowNodeId, nodeType });
           const isNodeVisited = await runtimeStateManager.isNodeVisited(
             workflowExecutionId,
             workflowNodeId
           );
+          console.info("Checking if node is visited", { workflowNodeId, isNodeVisited });
           if (!workflowNodeId || isNodeVisited) return;
 
+          console.info("Creating node execution", { workflowNodeId });
           const [nodeExecution] = await WorkflowNodeExecution.findOrCreate({
             where: { workflowExecutionId, workflowNodeId },
             defaults: {
@@ -101,7 +111,7 @@ const processNodesWithQueue = async ({
               status: WORKFLOW_NODE_EXECUTION_STATUS.QUEUED,
             },
           });
-
+          console.info("Node execution created", { nodeExecution: nodeExecution.id });
           await workflowExecution.reload();
           
           if (workflowExecution.status === WORKFLOW_EXECUTION_STATUS.STOPPED) {
@@ -109,7 +119,7 @@ const processNodesWithQueue = async ({
             error.code = "WF-ABORT";
             throw error;
           }
-
+          
           await processNode({
             workflowExecutionId,
             nodeExecution,
@@ -139,11 +149,14 @@ const processNodesWithQueue = async ({
               });
             });
           }
+          console.info("Added next nodes to queue");
           await runtimeStateManager.markNodeAsVisited(
             workflowExecutionId,
             workflowNodeId
           );
+          console.info("Marked node as visited", { workflowNodeId });
           await popNodeFromQueue({ workflowExecutionId, nodeQueue, index });
+          console.info("Popped node from queue", { workflowNodeId });
         },
         { concurrency: 3 }
       );
@@ -165,6 +178,7 @@ const processNodesWithQueue = async ({
         },
         []
       );
+      console.info("Remaining nodes", { remainingNodeIds: map(remainingNodes, "id") });
       nodeQueue.length = 0;
       await runtimeStateManager.flushQueuedNodes(workflowExecutionId);
       await Promise.map(remainingNodes, async remainingNode => {
@@ -174,6 +188,7 @@ const processNodesWithQueue = async ({
         );
         nodeQueue.push(remainingNode);
       });
+      console.info("Added remaining nodes to queue");
     }
   } catch (error) {
     console.error("Error in coreProcessors.processNodesWithQueue - ", error);
