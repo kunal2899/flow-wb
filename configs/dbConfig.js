@@ -42,7 +42,7 @@ const sequelizeConfig = {
 
 if (currEnvironment !== "production") {
   sequelizeConfig.ssl = false;
-  sequelizeConfig.logging = console.log;
+  sequelizeConfig.logging = false;
 } else {
   sequelizeConfig.ssl = true;
   sequelizeConfig.logging = false;
