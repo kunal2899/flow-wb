@@ -1,0 +1,72 @@
+{
+  "name": "flow-wb",
+  "version": "0.0.1",
+  "description": "Flow: Workflow builder",
+  "main": "app.js",
+  "_moduleAliases": {
+    "@configs": "configs",
+    "@constants": "constants",
+    "@entities": "entities",
+    "@utils": "utils",
+    "@controllers": "controllers",
+    "@middlewares": "middlewares",
+    "@models": "models",
+    "@routes": "routes",
+    "@schemas": "schemas",
+    "@services": "services",
+    "@workers": "workers",
+    "@helpers": "helpers"
+  },
+  "scripts": {
+    "start": "forever app.js --prod",
+    "start:local": "NODE_ENV=local nodemon --ignore workers/ app.js",
+    "workers": "forever workers/index.js --prod",
+    "workers:local": "NODE_ENV=local nodemon --watch workers/ workers/index.js",
+    "local-all": "concurrently -n \"api, workers\" \"npm run start:local\" \"npm run workers:local\"",
+    "prod-all": "concurrently -n \"api, workers\" \"npm run start\" \"npm run workers\"",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "sync": "node services/coreServices/modelSyncService.js",
+    "sync:force": "node services/coreServices/modelSyncService.js --force",
+    "sync:alter": "node services/coreServices/modelSyncService.js --alter"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kunal2899/flow-wb.git"
+  },
+  "author": "Kunal J.",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/kunal2899/flow-wb/issues"
+  },
+  "homepage": "https://github.com/kunal2899/flow-wb#readme",
+  "dependencies": {
+    "axios": "^1.12.2",
+    "bcrypt": "^6.0.0",
+    "bluebird": "^3.7.2",
+    "bullmq": "^5.60.0",
+    "cron-parser": "^5.4.0",
+    "express": "^5.1.0",
+    "express-rate-limit": "^8.2.1",
+    "joi": "^18.0.1",
+    "json-canonicalize": "^2.0.0",
+    "json-logic-js": "^2.0.5",
+    "jsonpath-plus": "^10.3.0",
+    "jsonwebtoken": "^9.0.2",
+    "lodash": "^4.17.21",
+    "module-alias": "^2.2.3",
+    "pg": "^8.16.3",
+    "pg-hstore": "^2.3.4",
+    "redis": "^4.7.0",
+    "sequelize": "^6.37.7",
+    "swagger-jsdoc": "^6.2.8",
+    "swagger-ui-express": "^5.0.1"
+  },
+  "devDependencies": {
+    "@types/json-logic-js": "^2.0.8",
+    "concurrently": "^9.2.1",
+    "dotenv": "^17.2.2",
+    "forever": "^4.0.3",
+    "nodemon": "^3.1.10",
+    "shortid": "^2.2.17"
+  }
+}
