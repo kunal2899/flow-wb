@@ -88,7 +88,7 @@ const getExecutionsHistory = async (req, res) => {
     });
   } catch (error) {
     console.error(
-      "Error in userWorkflowsController.pauseUserWorkflow - ",
+      "Error in userWorkflowsController.getExecutionsHistory - ",
       error
     );
     return res

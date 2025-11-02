@@ -1,13 +1,13 @@
-const IORedis = require('ioredis');
+const IORedis = require("ioredis");
 
-const environment = process.env.NODE_ENV || 'local';
-const config = require('./config.json');
+const environment = process.env.NODE_ENV || "local";
+const config = require("./config.json");
 const redisConfig = config[environment]?.redis;
 
 // Create a single IORedis connection configuration
 const createRedisConnection = () => {
   const connectionOptions = {
-    host: process.env[redisConfig?.host] || 'localhost',
+    host: process.env[redisConfig?.host] || "localhost",
     port: parseInt(process.env[redisConfig?.port]) || 6379,
     connectTimeout: 10000,
     commandTimeout: 15000,
@@ -18,7 +18,7 @@ const createRedisConnection = () => {
     keepAlive: true,
     enableOfflineQueue: true,
     reconnectOnError: (err) => {
-      const targetError = 'READONLY';
+      const targetError = "READONLY";
       return err.message.includes(targetError);
     },
   };
@@ -34,14 +34,14 @@ let sharedConnection = null;
 const getRedisConnection = () => {
   if (!sharedConnection) {
     sharedConnection = createRedisConnection();
-    sharedConnection.on('connect', () => {
-      console.log('Redis connected successfully!');
+    sharedConnection.on("connect", () => {
+      console.log("Redis connected successfully!");
     });
-    sharedConnection.on('error', (err) => {
-      console.error('Redis connection error:', err);
+    sharedConnection.on("error", (err) => {
+      console.error("Redis connection error:", err);
     });
-    sharedConnection.on('close', () => {
-      console.log('Redis connection closed.');
+    sharedConnection.on("close", () => {
+      console.log("Redis connection closed.");
     });
   }
   return sharedConnection;
@@ -51,7 +51,7 @@ const closeRedisConnection = async () => {
   if (sharedConnection) {
     await sharedConnection.quit();
     sharedConnection = null;
-    console.log('Redis connection closed successfully!');
+    console.log("Redis connection closed successfully!");
   }
 };
 

@@ -9,13 +9,16 @@ const checkTriggerExistence = async (req, res, next) => {
       userWorkflowTriggerId,
       { attributes: { exclude: ["createdAt", "updatedAt", "deletedAt"] } }
     );
-    if (!userWorkflowTrigger) return res.status(404).json({ message: "User workflow trigger not found" });
+    if (!userWorkflowTrigger)
+      return res
+        .status(404)
+        .json({ message: "User workflow trigger not found" });
     req.userWorkflowTrigger = userWorkflowTrigger;
     next();
   } catch (error) {
     console.error("Error in middlewares.checkTriggerExistence - ", error);
     return res.status(400).send({ message: "Something went wrong!" });
   }
-}
+};
 
-module.exports = checkTriggerExistence
+module.exports = checkTriggerExistence;

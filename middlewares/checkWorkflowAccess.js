@@ -32,7 +32,6 @@ const checkWorkflowAccess = async (req, res, next) => {
     }
 
     req.userWorkflow = userWorkflow;
-    console.log({ workflowIdAtWOrkflow: workflowId })
     next();
   } catch (error) {
     console.error("Error in middlewares.checkWorkflowAccess - ", error);

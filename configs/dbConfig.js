@@ -2,6 +2,7 @@ const { Sequelize } = require('sequelize');
 const dotenv = require("dotenv");
 const envConfigs = require("./config.json");
 const initModelDefaultConfig = require('../services/coreServices/initModelDefaultConfig');
+const { has } = require('lodash');
 
 dotenv.config({ path: ".env", quiet: true});
 const currEnvironment = process.env.NODE_ENV || "development";
@@ -13,7 +14,7 @@ if (currEnvironment === "test") {
 let { [currEnvironment]: config } = envConfigs;
 
 config = Object.entries(config).reduce((configValues, [key, envKey]) => {
-  if (envKey in process.env) {
+  if (has(process.env, envKey)) {
     configValues[key] = process.env[envKey];
   }
   return configValues;
@@ -40,13 +41,8 @@ const sequelizeConfig = {
   dialect: 'postgres'
 };
 
-if (currEnvironment !== "production") {
-  sequelizeConfig.ssl = false;
-  sequelizeConfig.logging = false;
-} else {
-  sequelizeConfig.ssl = true;
-  sequelizeConfig.logging = false;
-}
+sequelizeConfig.ssl = currEnvironment === 'production';
+sequelizeConfig.logging = false;
 
 const sequelize = new Sequelize(connectionString, sequelizeConfig);
 

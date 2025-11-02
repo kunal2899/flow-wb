@@ -48,7 +48,7 @@ class BaseQueue {
     return this.queue.upsertJobScheduler(
       jobSchedulerId,
       { tz: "Asia/Kolkata", ...options },
-      jobData,
+      jobData
     );
   }
 
@@ -59,6 +59,6 @@ class BaseQueue {
   _getQueueInstance() {
     return this.queue;
   }
-};
+}
 
 module.exports = BaseQueue;
