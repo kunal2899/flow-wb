@@ -186,6 +186,8 @@ npm run local:all
 After that you can access API routes at `localhost:3000`
 and API documentation at `localhost:3000/api-docs`
 
+![API doc](assets/api-doc-ss.png)
+
 
 ## Credits
 
